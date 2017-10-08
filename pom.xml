@@ -17,6 +17,7 @@
     <properties>
          <ehcache-org.version>3.4.0</ehcache-org.version>
          <ehcache.version>2.10.3</ehcache.version>
+         <slf4j.version>1.7.25</slf4j.version>
     </properties>
 
     <build>
@@ -113,6 +114,18 @@
              <artifactId>javax.websocket-api</artifactId>
          </dependency>
     	
+    	
+    	<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+		    <version>${slf4j.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>commons-logging</groupId>
+		    <artifactId>commons-logging</artifactId>
+		    <version>1.2</version>
+		</dependency>
 
     </dependencies>
 
