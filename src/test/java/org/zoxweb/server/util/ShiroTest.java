@@ -8,6 +8,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.util.Factory;
 import org.zoxweb.server.io.IOUtil;
+import org.zoxweb.shared.data.StatCounter;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
@@ -55,7 +56,26 @@ public class ShiroTest
 		    
 		    Collection<Realm> realms =  ((RealmSecurityManager)SecurityUtils.getSecurityManager()).getRealms();
 		    System.out.println(realms);
-		   
+		    
+		    String permissions[]=
+		    	{
+		    		"read:batata",
+		    		"write:batata", 
+		    		"update:batata",
+		    		"batata:update",
+		    		"batata:update:all"
+		    	};
+		    
+		    StatCounter sc = new StatCounter();
+		    for(int i=0 ; i < 1; i++)
+		    for (String permission : permissions)
+		    {
+		    		//currentUser.isPermitted(permission);
+		    		
+		    		System.out.println(permission + " stat:" + currentUser.isPermitted(permission));
+		    }
+		    System.out.println(sc.deltaSinceCreation());
+		    
 		    
 		    
 		}
@@ -63,5 +83,8 @@ public class ShiroTest
 		{
 			e.printStackTrace();
 		}
+		
+		System.exit(0);
 	}
 }
+
