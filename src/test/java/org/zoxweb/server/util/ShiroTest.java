@@ -63,7 +63,9 @@ public class ShiroTest
 		    		"write:batata", 
 		    		"update:batata",
 		    		"batata:update",
-		    		"batata:update:all"
+		    		"batata:update:all",
+		    		"file:read:f1",
+		    		"file:write:f2"
 		    	};
 		    
 		    StatCounter sc = new StatCounter();
