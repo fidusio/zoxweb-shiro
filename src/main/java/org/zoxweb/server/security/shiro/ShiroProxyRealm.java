@@ -119,7 +119,7 @@ public class ShiroProxyRealm extends AuthorizingRealm
 
 //		DomainAuthenticationInfo ret = new DomainAuthenticationInfo(token.getPrincipal(), token.getCredentials(), getName() , domainID, applicationID);
 //		log.info( "" + token.getPrincipal() );
-//		if ( !"marwan".equals(token.getPrincipal()))
+//		if ( !"mario".equals(token.getPrincipal()))
 //			throw new AuthenticationException("Invalid token");
 //		
 //		return ret;
