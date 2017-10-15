@@ -54,20 +54,20 @@ public class JCacheTest {
 		System.out.println(sjc.size());
 		Toto toto = new Toto("nael");
 		
-		sjc.put("marwan", toto);
+		sjc.put("mario", toto);
 		System.out.println(sjc.size());
-		System.out.println("marwan:"+sjc.get("marwan"));
+		System.out.println("mario:"+sjc.get("mario"));
 		System.out.println(""+sjc.get("toto"));
 		System.out.println(sjc.values());
 		System.out.println(sjc.keys());
-		System.out.println("are equals " + (toto.equals(sjc.get("marwan"))));
-		//sjc.put("marwan", new Toto("Imad"));	
+		System.out.println("are equals " + (toto.equals(sjc.get("mario"))));
+		//sjc.put("mario", new Toto("Imad"));	
 		System.out.println(sjc.size());
 		for(int i = 0; i < 10; i++)
 		{
 			sjc.put("key-" +i, new Toto("toto-"+0));
 		}
-		System.out.println("marwan:"+sjc.get("marwan"));
+		System.out.println("mario:"+sjc.get("mario"));
 		System.out.println(sjc.size());
 		try {
 			Thread.sleep(5000);
@@ -76,7 +76,7 @@ public class JCacheTest {
 			e.printStackTrace();
 		}
 		
-		System.out.println("marwan:"+sjc.get("marwan"));
+		System.out.println("mario:"+sjc.get("mario"));
 		System.out.println(sjc.values());
 		System.out.println(sjc.keys());
 		
