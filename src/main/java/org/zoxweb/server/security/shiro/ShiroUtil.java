@@ -108,7 +108,7 @@ public class ShiroUtil
 			{
 				if (subject.getPrincipals() instanceof DomainPrincipalCollection)
 				{
-					return ((DomainPrincipalCollection)subject.getPrincipals()).getUserID();
+					return ((DomainPrincipalCollection)subject.getPrincipals()).getSubjectID();
 				}
 			}
 
@@ -216,7 +216,7 @@ public class ShiroUtil
 		}
 	}
 
-	public static String subjectApplicationID()
+	public static String subjectAppID()
 		throws AccessException
     {
 	    try
@@ -227,7 +227,7 @@ public class ShiroUtil
 			{
 				if (subject.getPrincipals() instanceof DomainPrincipalCollection)
 				{
-					return ((DomainPrincipalCollection)subject.getPrincipals()).getApplicationID();
+					return ((DomainPrincipalCollection)subject.getPrincipals()).getAppID();
 				}	
 			}
 			

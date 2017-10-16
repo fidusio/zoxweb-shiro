@@ -91,6 +91,7 @@ public abstract class ShiroBaseRealm
 			DomainUsernamePasswordToken upToken = (DomainUsernamePasswordToken) token;
 	        String userName = upToken.getUsername();
 	        String domainID = upToken.getDomainID();
+	        String applicationID = upToken.getAppID();
 	        String userID = upToken.getUserID();
 	        log.info( domainID +":"+userName);
 	        // Null username is invalid
@@ -106,7 +107,7 @@ public abstract class ShiroBaseRealm
 	        	throw new UnknownAccountException("No account found for user [" + userID + "]");
 	        }
 
-	        return new DomainAuthenticationInfo(userName, userID, password, getName(), domainID, null);
+	        return new DomainAuthenticationInfo(userName, userID, password, getName(), domainID, applicationID);
 	    }	
 		 throw new AuthenticationException("Not a domain info");
 	}

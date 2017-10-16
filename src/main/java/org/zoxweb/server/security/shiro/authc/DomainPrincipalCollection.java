@@ -16,11 +16,13 @@
 package org.zoxweb.server.security.shiro.authc;
 
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.zoxweb.shared.util.AppID;
 import org.zoxweb.shared.util.SharedStringUtil;
 
 @SuppressWarnings("serial")
 public class DomainPrincipalCollection
     extends SimplePrincipalCollection
+    implements AppID<String>
 {
 
 	protected String domain_id;
@@ -48,19 +50,61 @@ public class DomainPrincipalCollection
 		return domain_id;
 	}
 	
-	public String getApplicationID()
-    {
-		return application_id;
-	}
+//	public String getApplicationID()
+//    {
+//		return application_id;
+//	}
 
 	/**
 	 * This is a second unique identifier
 	 *
 	 * @return user id
 	 */
-	public String getUserID()
-    {
+//	public String getUserID()
+//    {
+//		return user_id;
+//	}
+
+	@Override
+	public void setDomainID(String domainID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getSubjectID() {
+		// TODO Auto-generated method stub
 		return user_id;
+	}
+
+	@Override
+	public void setSubjectID(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getAppGID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setAppGID(String appGID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getAppID() {
+		// TODO Auto-generated method stub
+		return application_id;
+	}
+
+	@Override
+	public void setAppID(String appID) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
