@@ -110,6 +110,7 @@ public class ShiroUtil
 				{
 					return ((DomainPrincipalCollection)subject.getPrincipals()).getSubjectID();
 				}
+				
 			}
 
 			throw new AccessException("Subject not authenticated");
