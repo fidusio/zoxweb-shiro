@@ -35,6 +35,7 @@ public class ShiroProxyAuthentication
 {
 	public static final String AUTHENTICATION_URI = "shiro/loginProxy";
 	
+	
 	private static final transient Logger log = Logger.getLogger(Const.LOGGER_NAME);
 	
 	public static LoginStatusDAO login(String httpUrl, boolean sslCheckOff, String domainID, String appID, String realm, String username, String password)
