@@ -471,6 +471,13 @@ public class DefaultAPISecurityManager
 		
 		return userID;
 	}
+	
+	public final void checkPermissions(String ...permissions)
+			 throws NullPointerException, AccessException
+	{
+		ShiroUtil.checkPermissions(permissions);
+	}
+	
 
 	@Override
 	public final boolean isNVEntityAccessible(String nveRefID, String nveUserID, CRUD... permissions) {
