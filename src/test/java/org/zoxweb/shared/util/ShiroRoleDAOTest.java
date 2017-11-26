@@ -26,7 +26,7 @@ public class ShiroRoleDAOTest {
 	public static void main(String[] args) {
 		ShiroRoleDAO role = new ShiroRoleDAO();
 		role.setName("Role 1");
-		role.setDomainID("zoxweb.com");
+		role.setDomainAppID("zoxweb.com", "empty");
 		
 		int index = 0;
 		
