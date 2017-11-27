@@ -31,16 +31,19 @@ public class ShiroRoleDAOTest {
 		int index = 0;
 		
 		ShiroPermissionDAO permission = new ShiroPermissionDAO();
+		
 		permission.setName("Permission 1");
 		permission.setPermissionPattern("5418541");
 		permission.setReferenceID("" + index++);
-		
+		permission.setDomainAppID("zoxweb.com", "empty");
+		System.out.println(permission);
 		role.getPermissions().add(permission);
 		
 		permission = new ShiroPermissionDAO();
 		permission.setName("Permission 2");
 		permission.setPermissionPattern("5418541");
 		permission.setReferenceID("" + index++);
+		System.out.println(permission);
 		
 		role.getPermissions().add(permission);
 		
@@ -48,6 +51,7 @@ public class ShiroRoleDAOTest {
 		permission.setName("Permission 3");
 		permission.setPermissionPattern("5418541");
 		permission.setReferenceID("" + index++);
+		System.out.println(permission);
 		
 		role.getPermissions().add(permission);
 		
@@ -55,6 +59,7 @@ public class ShiroRoleDAOTest {
 		permission.setName("Permission 4");
 		permission.setPermissionPattern("5418541");
 		permission.setReferenceID("" + index++);
+		System.out.println(permission);
 		
 		role.getPermissions().add(permission);		
 		role.getPermissions().add(permission);

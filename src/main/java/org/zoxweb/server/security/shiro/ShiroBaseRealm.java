@@ -16,6 +16,7 @@
 package org.zoxweb.server.security.shiro;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -32,7 +33,10 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainAuthenticationInfo;
 import org.zoxweb.server.security.shiro.authc.DomainPrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
+import org.zoxweb.shared.api.APIDataStore;
 import org.zoxweb.shared.crypto.PasswordDAO;
+import org.zoxweb.shared.data.AppIDDAO;
+import org.zoxweb.shared.db.QueryMatchString;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.shiro.ShiroAssociationDAO;
 import org.zoxweb.shared.security.shiro.ShiroAssociationType;
@@ -45,6 +49,9 @@ import org.zoxweb.shared.security.shiro.ShiroRoleGroupDAO;
 import org.zoxweb.shared.security.shiro.ShiroRulesManager;
 import org.zoxweb.shared.security.shiro.ShiroSubjectDAO;
 import org.zoxweb.shared.util.Const;
+import org.zoxweb.shared.util.Const.RelationalOperator;
+import org.zoxweb.shared.util.MetaToken;
+import org.zoxweb.shared.util.SharedUtil;
 
 public abstract class ShiroBaseRealm
     extends AuthorizingRealm
@@ -163,14 +170,17 @@ public abstract class ShiroBaseRealm
 	public ShiroRoleDAO addRole(ShiroRoleDAO role)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		return null;
+		return getDataStore().insert(role);
 	}
 
 	
 	public ShiroRoleDAO deleteRole(ShiroRoleDAO role, boolean withPermissions)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		return null;
+		
+		
+		getDataStore().delete(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, new QueryMatchString(RelationalOperator.EQUAL, role.getSubjectID(),AppIDDAO.Param.APP_ID));
+		return role;
 	}
 
 	
@@ -205,14 +215,14 @@ public abstract class ShiroBaseRealm
 	public ShiroPermissionDAO addPermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		return null;
+		return getDataStore().insert(permission);
 	}
 
 	
 	public ShiroPermissionDAO deletePermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
-		// TODO Auto-generated method stub
-		return null;
+		getDataStore().delete(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, new QueryMatchString(RelationalOperator.EQUAL, permission.getSubjectID(),AppIDDAO.Param.APP_ID));
+		return permission;
 	}
 
 	
@@ -274,4 +284,51 @@ public abstract class ShiroBaseRealm
 		return null;
 	}
 
+	public ShiroPermissionDAO lookupPermission(String permissionID)
+			throws NullPointerException, IllegalArgumentException, AccessException
+	{
+		SharedUtil.checkIfNulls("Null permission id", permissionID);
+			
+		List<ShiroPermissionDAO> ret = null;
+		if (getDataStore().isValidReferenceID(permissionID))
+		{
+			ret = getDataStore().search(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, permissionID, MetaToken.REFERENCE_ID));
+		}
+		else
+		{
+			ret = getDataStore().search(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, permissionID, AppIDDAO.Param.SUBJECT_ID));
+		}
+		
+		if (ret != null && ret.size() == 1)
+		{
+			return ret.get(0);
+		}
+		return null;
+	}
+	
+	
+	public ShiroRoleDAO lookupRole(String roleID)
+			throws NullPointerException, IllegalArgumentException, AccessException
+	{
+		SharedUtil.checkIfNulls("Null permission id", roleID);
+		
+		
+		List<ShiroRoleDAO> ret = null;
+		if (getDataStore().isValidReferenceID(roleID))
+		{
+			ret = getDataStore().search(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, roleID, MetaToken.REFERENCE_ID));
+		}
+		else
+		{
+			ret = getDataStore().search(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, roleID, AppIDDAO.Param.SUBJECT_ID));
+		}
+		
+		if (ret != null && ret.size() == 1)
+		{
+			return ret.get(0);
+		}
+		return null;
+	}
+	
+	public abstract APIDataStore<?> getDataStore();
 }
