@@ -41,12 +41,12 @@ import org.zoxweb.shared.util.ResourceManager.Resource;
 
 
 @SuppressWarnings("serial")
-public class ShiroDaemonLoginServlet 
+public class ShiroAutoLoginServlet 
 	extends ShiroBaseServlet 
 {
 	//public static Subject DAEMON = null;
 	
-	private static final transient Logger log = Logger.getLogger(ShiroDaemonLoginServlet.class.getName());
+	private static final transient Logger log = Logger.getLogger(ShiroAutoLoginServlet.class.getName());
 	
 	protected  void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException 
