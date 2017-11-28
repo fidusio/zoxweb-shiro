@@ -98,6 +98,10 @@ public abstract class ShiroBaseServlet
             if (subject == null || !subject.isAuthenticated())
             {
                 log.info("security check required and user not authenticated");
+                // check authentication token first
+                // and try to login
+                // 2 modes are supported BasicAuthenticatio and JWT
+                
                 HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, DEFAULT_API_ERROR);
                 return false;
             }

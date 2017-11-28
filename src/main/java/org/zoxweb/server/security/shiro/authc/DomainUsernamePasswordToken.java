@@ -35,16 +35,16 @@ public class DomainUsernamePasswordToken
 		
 	}
 	
-	public DomainUsernamePasswordToken(final String usnernanme, final String password,
+	public DomainUsernamePasswordToken(final String username, final String password,
             final boolean rememberMe, final String host, final String domainID)
     {
-		this(usnernanme, password, rememberMe, host, domainID, null);
+		this(username, password, rememberMe, host, domainID, null);
 	}
 	
-	public DomainUsernamePasswordToken(final String usnernanme, final String password,
+	public DomainUsernamePasswordToken(final String username, final String password,
             final boolean rememberMe, final String host, final String domainID, String applicationID)
     {
-		super(SharedStringUtil.toLowerCase(usnernanme), password, rememberMe, host);
+		super(SharedStringUtil.toLowerCase(username), password, rememberMe, host);
 		setDomainID(domainID);
 		setAppID(applicationID);
 		//setUserID(realmID);

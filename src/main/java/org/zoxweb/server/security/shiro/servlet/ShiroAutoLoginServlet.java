@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.http.HTTPRequestAttributes;
 import org.zoxweb.server.http.servlet.HTTPServletUtil;
-
 import org.zoxweb.server.util.GSONUtil;
 import org.zoxweb.server.util.ServerUtil;
 import org.zoxweb.shared.api.APIError;
@@ -48,14 +47,18 @@ public class ShiroAutoLoginServlet
 	
 	private static final transient Logger log = Logger.getLogger(ShiroAutoLoginServlet.class.getName());
 	
-	protected  void doPost(HttpServletRequest req, HttpServletResponse resp)
+	public  void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException 
 	{
 		
+		// filter way
+		HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
+		
+		// no filter
+		if(hra == null)
+			hra = HTTPServletUtil.extractRequestAttributes(req);
 		
 		
-		//log.info(Thread.currentThread().getName());
-		HTTPRequestAttributes hra = HTTPServletUtil.extractRequestAttributes(req);
 		APISecurityManager<Subject> apiSecurityManager = ResourceManager.SINGLETON.lookup(Resource.API_SECURITY_MANAGER);
 		if (apiSecurityManager != null && apiSecurityManager.getDaemonSubject() == null)
 		{
@@ -65,8 +68,11 @@ public class ShiroAutoLoginServlet
 				if (apiSecurityManager.getDaemonSubject() == null)
 				{
 					HTTPAuthenticationBasic hab = (HTTPAuthenticationBasic) hra.getHTTPAuthentication();
-					log.info("" + hra);
+					log.info("Authentication:" + hab);
+					log.info("hra:" + hra.getContentType());
+					log.info("Content:" + hra.getContent());
 					AppIDDAO appIDDAO = GSONUtil.fromJSON(hra.getContent(), AppIDDAO.class);
+					log.info(""+appIDDAO);
 					Subject daemon = apiSecurityManager.login(hab.getUser(), null, appIDDAO.getDomainID(), appIDDAO.getAppID(), true);
 					
 					apiSecurityManager.setDaemonSubject(daemon);

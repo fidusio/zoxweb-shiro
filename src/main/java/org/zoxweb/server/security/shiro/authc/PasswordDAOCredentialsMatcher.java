@@ -46,23 +46,26 @@ public class PasswordDAOCredentialsMatcher
 				return true;
 			}
 			
-			PasswordDAO passwordDAO = (PasswordDAO) info.getCredentials();
-			String password = null;
-			
-			if (token.getCredentials() instanceof char[])
+			if (info.getCredentials() instanceof PasswordDAO)
 			{
-				password = new String ((char[])token.getCredentials());
+				PasswordDAO passwordDAO = (PasswordDAO) info.getCredentials();
+				String password = null;
+				
+				if (token.getCredentials() instanceof char[])
+				{
+					password = new String ((char[])token.getCredentials());
+				}
+				else if (token.getCredentials() instanceof byte[])
+				{
+					password = SharedStringUtil.toString((byte[])token.getCredentials());
+				}
+				else if(token.getCredentials() instanceof String)
+				{
+					password = (String) token.getCredentials();
+				}
+	
+				return CryptoUtil.isPasswordValid(passwordDAO, password);
 			}
-			else if (token.getCredentials() instanceof byte[])
-			{
-				password = SharedStringUtil.toString((byte[])token.getCredentials());
-			}
-			else if(token.getCredentials() instanceof String)
-			{
-				password = (String) token.getCredentials();
-			}
-
-			return CryptoUtil.isPasswordValid(passwordDAO, password);
 		}
 		catch (Exception e)
         {
