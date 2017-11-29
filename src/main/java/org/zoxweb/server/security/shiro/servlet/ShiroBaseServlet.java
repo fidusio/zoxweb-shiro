@@ -26,11 +26,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.zoxweb.server.http.HTTPRequestAttributes;
 import org.zoxweb.server.http.servlet.HTTPServletUtil;
+import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.http.HTTPMethod;
 import org.zoxweb.shared.http.HTTPStatusCode;
 import org.zoxweb.shared.security.AccessException;
+import org.zoxweb.shared.security.JWTToken;
 import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.SharedUtil;
 
@@ -101,6 +104,26 @@ public abstract class ShiroBaseServlet
                 // check authentication token first
                 // and try to login
                 // 2 modes are supported BasicAuthenticatio and JWT
+                
+                HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
+                JWTToken jwtToken = hra.getJWTToken();
+                if(jwtToken != null)
+                {
+    	    	
+                	try
+                	{
+                		JWTAuthenticationToken authToken = new JWTAuthenticationToken(jwtToken);
+                		subject = SecurityUtils.getSubject();
+                		subject.login(authToken);
+                		log.info("Implicit login activated");
+                		return true;
+                	}
+                	catch(Exception e)
+                	{
+                		
+                	}
+                }
+
                 
                 HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, DEFAULT_API_ERROR);
                 return false;

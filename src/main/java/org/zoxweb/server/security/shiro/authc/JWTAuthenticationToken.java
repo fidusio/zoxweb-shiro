@@ -2,12 +2,14 @@ package org.zoxweb.server.security.shiro.authc;
 
 import org.apache.shiro.authc.HostAuthenticationToken;
 import org.apache.shiro.authc.RememberMeAuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.zoxweb.shared.security.JWTToken;
 import org.zoxweb.shared.util.AppID;
 import org.zoxweb.shared.util.SharedUtil;
 
 @SuppressWarnings("serial")
 public class JWTAuthenticationToken
+extends UsernamePasswordToken
 implements AppID<String>, HostAuthenticationToken, RememberMeAuthenticationToken
 {
 	

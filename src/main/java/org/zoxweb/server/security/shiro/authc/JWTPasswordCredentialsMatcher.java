@@ -1,15 +1,18 @@
 package org.zoxweb.server.security.shiro.authc;
 
+import java.util.logging.Logger;
+
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.zoxweb.server.security.CryptoUtil;
 import org.zoxweb.server.security.JWTProvider;
+
 import org.zoxweb.shared.crypto.PasswordDAO;
 import org.zoxweb.shared.util.SharedStringUtil;
 
 public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
-
+	protected static final transient Logger log = Logger.getLogger(JWTPasswordCredentialsMatcher.class.getName());
 	@Override
 	public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) 
 	{
@@ -17,6 +20,7 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 		
 		try
         {
+		
 			if (info.getCredentials() instanceof PasswordDAO)
 			{
 				if (!token.getPrincipal().equals(info.getPrincipals().getPrimaryPrincipal()))
