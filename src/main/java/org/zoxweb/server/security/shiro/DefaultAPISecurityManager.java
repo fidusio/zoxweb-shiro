@@ -313,7 +313,7 @@ public class DefaultAPISecurityManager
 				
 				/// must create a exclusion filter
 				if (!(nve instanceof UserIDDAO || nve instanceof MessageTemplateDAO))
-					nve.setUserID(userID != null ? userID : getCurrentUserID());
+					nve.setUserID(userID != null ? userID : currentUserID());
 				
 				for (NVBase<?> nvb : nve.getAttributes().values().toArray( new NVBase[0]))
 				{
@@ -344,13 +344,24 @@ public class DefaultAPISecurityManager
 	}
 
 	@Override
-	public final String getCurrentPrincipal() {
+	public final String currentSubjectID() {
 		// TODO Auto-generated method stub
 		return (String) SecurityUtils.getSubject().getPrincipal();
 	}
+	
+	public final String currentDomainID()
+	{
+		return ShiroUtil.subjectDomainID();
+	}
+	
+	public final String currentAppID()
+	{
+		return ShiroUtil.subjectAppID();
+	}
+	
 
 	@Override
-	public final String getCurrentUserID()
+	public final String currentUserID()
 			throws AccessException
 	{
 		// new code
@@ -436,7 +447,7 @@ public class DefaultAPISecurityManager
 			return nve.getUserID();
 		}
 		
-		String userID = getCurrentUserID();
+		String userID = currentUserID();
 		
 		if (userID == null || nve.getUserID() == null)
 		{
@@ -483,7 +494,7 @@ public class DefaultAPISecurityManager
 	public final boolean isNVEntityAccessible(String nveRefID, String nveUserID, CRUD... permissions) {
 		SharedUtil.checkIfNulls("Null reference ID.", nveRefID);
 		
-		String userID = getCurrentUserID();
+		String userID = currentUserID();
 		
 		if (userID != null && nveUserID != null)
 		{
@@ -533,7 +544,7 @@ public class DefaultAPISecurityManager
 	{
 		SharedUtil.checkIfNulls("Null reference ID.", nveRefID);
 		
-		String userID = getCurrentUserID();
+		String userID = currentUserID();
 		
 		if (userID == null || nveUserID == null)
 		{
@@ -567,7 +578,7 @@ public class DefaultAPISecurityManager
 	{
 		SharedUtil.checkIfNulls("Null reference ID.", nveRefID);
 		
-		String userID = getCurrentUserID();
+		String userID = currentUserID();
 		
 		if (userID == null)
 		{

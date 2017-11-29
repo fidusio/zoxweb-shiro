@@ -108,7 +108,7 @@ public class ShiroUtil
 			{
 				if (subject.getPrincipals() instanceof DomainPrincipalCollection)
 				{
-					return ((DomainPrincipalCollection)subject.getPrincipals()).getSubjectID();
+					return ((DomainPrincipalCollection)subject.getPrincipals()).getUserID();
 				}
 				
 			}
