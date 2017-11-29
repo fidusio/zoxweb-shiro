@@ -52,6 +52,7 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 			else if (info.getCredentials() instanceof byte[] && token instanceof JWTAuthenticationToken)
 			{
 				JWTProvider.SINGLETON.decodeJWT((byte[]) info.getCredentials(), (String)token.getCredentials());
+				return true;
 			}
 		}
 		catch (Exception e)

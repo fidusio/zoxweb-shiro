@@ -59,6 +59,12 @@ implements AppID<String>, HostAuthenticationToken, RememberMeAuthenticationToken
 		// TODO Auto-generated method stub
 		return subjectID;
 	}
+	
+	
+	public String getJWTSubjectID()
+	{
+		return jwtToken.getJWT().getPayload().getSubjectID();
+	}
 
 	@Override
 	public void setSubjectID(String id) {

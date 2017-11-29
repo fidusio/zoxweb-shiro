@@ -60,10 +60,10 @@ public class DomainPrincipalCollection
 	 *
 	 * @return user id
 	 */
-//	public String getUserID()
-//    {
-//		return user_id;
-//	}
+	public String getUserID()
+    {
+		return user_id;
+	}
 
 	@Override
 	public void setDomainID(String domainID) {
@@ -74,7 +74,7 @@ public class DomainPrincipalCollection
 	@Override
 	public String getSubjectID() {
 		// TODO Auto-generated method stub
-		return user_id;
+		return (String) getPrimaryPrincipal();
 	}
 
 	@Override
