@@ -36,6 +36,8 @@ import org.zoxweb.shared.http.HTTPMethod;
 import org.zoxweb.shared.http.HTTPStatusCode;
 import org.zoxweb.shared.util.ResourceManager;
 import org.zoxweb.shared.util.ResourceManager.Resource;
+import org.zoxweb.shared.util.SharedStringUtil;
+import org.zoxweb.shared.util.SharedUtil;
 
 
 
@@ -71,7 +73,23 @@ public class ShiroAutoLoginServlet
 					log.info("Authentication:" + hab);
 					log.info("hra:" + hra.getContentType());
 					log.info("Content:" + hra.getContent());
-					AppIDDAO appIDDAO = GSONUtil.fromJSON(hra.getContent(), AppIDDAO.class);
+					AppIDDAO appIDDAO = null;
+					
+					if (!SharedStringUtil.isEmpty(hra.getContent()))
+					{
+						appIDDAO = GSONUtil.fromJSON(hra.getContent(), AppIDDAO.class);
+					}
+					else 
+					{
+						String domainID = SharedUtil.getValue(hra.getParameters().get(AppIDDAO.Param.DOMAIN_ID.getNVConfig()));
+						String appID = SharedUtil.getValue(hra.getParameters().get(AppIDDAO.Param.APP_ID.getNVConfig()));
+						if (domainID != null && appID != null)
+						{
+							appIDDAO = new AppIDDAO();
+							appIDDAO.setDomainAppID(domainID, appID);
+						}
+				
+					}
 					log.info(""+appIDDAO);
 					Subject daemon = apiSecurityManager.login(hab.getUser(), null, appIDDAO.getDomainID(), appIDDAO.getAppID(), true);
 					

@@ -6,7 +6,6 @@ import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.zoxweb.server.security.CryptoUtil;
 import org.zoxweb.server.security.JWTProvider;
 import org.zoxweb.shared.crypto.PasswordDAO;
-import org.zoxweb.shared.security.JWTDAO;
 import org.zoxweb.shared.util.SharedStringUtil;
 
 public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
@@ -14,21 +13,24 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 	@Override
 	public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) 
 	{
-		if (!token.getPrincipal().equals(info.getPrincipals().getPrimaryPrincipal()))
-		{
-			return false;
-		}
+		
 		
 		try
         {
-			if (token instanceof DomainUsernamePasswordToken
-                    && ((DomainUsernamePasswordToken)token).isAutoAuthenticationEnabled())
-			{
-				return true;
-			}
-			
 			if (info.getCredentials() instanceof PasswordDAO)
 			{
+				if (!token.getPrincipal().equals(info.getPrincipals().getPrimaryPrincipal()))
+				{
+					return false;
+				}
+			
+				if (token instanceof DomainUsernamePasswordToken
+	                    && ((DomainUsernamePasswordToken)token).isAutoAuthenticationEnabled())
+				{
+					return true;
+				}
+			
+	
 				PasswordDAO passwordDAO = (PasswordDAO) info.getCredentials();
 				String password = null;
 				
@@ -47,10 +49,9 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 	
 				return CryptoUtil.isPasswordValid(passwordDAO, password);
 			}
-			else if (info.getCredentials() instanceof JWTDAO)
+			else if (info.getCredentials() instanceof byte[] && token instanceof JWTAuthenticationToken)
 			{
-				JWTDAO jwtDAO = (JWTDAO) info.getCredentials();
-				JWTProvider.SINGLETON.decodeJWT(jwtDAO.getSecret(), jwtDAO.getToken());
+				JWTProvider.SINGLETON.decodeJWT((byte[]) info.getCredentials(), (String)token.getCredentials());
 			}
 		}
 		catch (Exception e)

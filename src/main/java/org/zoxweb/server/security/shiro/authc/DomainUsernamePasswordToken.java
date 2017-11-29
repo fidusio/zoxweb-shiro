@@ -104,22 +104,6 @@ public class DomainUsernamePasswordToken
 		setUsername(subjectID);
 	}
 
-	@Override
-	@Deprecated
-	public String getAppGID()
-		throws UnsupportedOperationException
-	{
-		throw new UnsupportedOperationException();
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	@Deprecated
-	public void setAppGID(String appGID)
-		throws UnsupportedOperationException
-	{
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
+	
 
 }

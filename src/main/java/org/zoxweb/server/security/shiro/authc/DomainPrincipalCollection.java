@@ -83,17 +83,7 @@ public class DomainPrincipalCollection
 		
 	}
 
-	@Override
-	public String getAppGID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setAppGID(String appGID) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	@Override
 	public String getAppID() {
