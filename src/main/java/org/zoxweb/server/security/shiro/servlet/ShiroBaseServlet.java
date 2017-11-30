@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ import org.zoxweb.shared.http.HTTPStatusCode;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.JWTToken;
 import org.zoxweb.shared.util.Const;
+import org.zoxweb.shared.util.Const.Bool;
 import org.zoxweb.shared.util.SharedUtil;
 
 @SuppressWarnings("serial")
@@ -44,13 +46,32 @@ public abstract class ShiroBaseServlet
 
     public static final APIError DEFAULT_API_ERROR = new APIError(new AccessException("Access denied.", null, true));
     private static final transient Logger log = Logger.getLogger(ShiroBaseServlet.class.getName());
-
-    public ShiroBaseServlet()
+    
+    
+    public static final String SECURITY_CHECK = "SECURITY_CHECK";
+    public static final String AUTO_LOGOUT = "AUTO_LOGOUT";
+    protected boolean isSecurityCheckRequired = false;
+    protected boolean isAutoLogout = false;
+    
+    public void init(ServletConfig config)
+            throws ServletException
     {
-        super();
+    	super.init(config);
+    	isSecurityCheckRequired = config.getInitParameter(SECURITY_CHECK) != null ? Bool.lookupValue(config.getInitParameter(SECURITY_CHECK)) : false;
+    	isAutoLogout = config.getInitParameter(SECURITY_CHECK) != null ? Bool.lookupValue(config.getInitParameter(AUTO_LOGOUT)) : false;
+    	log.info("isSecurityCheckRequired:"+isSecurityCheckRequired+",isAutoLogout:"+isAutoLogoutEnabled());
     }
+    
+    
+//    public ShiroBaseServlet()
+//    {
+//        super();
+//    }
 
-    protected abstract boolean isSecurityCheckRequired(HTTPMethod httpMethod, HttpServletRequest req);
+    protected boolean isSecurityCheckRequired(HTTPMethod httpMethod, HttpServletRequest req)
+    {
+    	return isSecurityCheckRequired;
+    }
 
     /**
      * Default patch support
@@ -78,7 +99,7 @@ public abstract class ShiroBaseServlet
 
     protected boolean isAutoLogoutEnabled()
     {
-        return false;
+        return isAutoLogout;
     }
 
     /**
