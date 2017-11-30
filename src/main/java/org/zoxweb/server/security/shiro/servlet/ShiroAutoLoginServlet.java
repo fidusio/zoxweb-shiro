@@ -44,9 +44,7 @@ import org.zoxweb.shared.util.SharedUtil;
 @SuppressWarnings("serial")
 public class ShiroAutoLoginServlet 
 	extends ShiroBaseServlet 
-{
-	//public static Subject DAEMON = null;
-	
+{	
 	private static final transient Logger log = Logger.getLogger(ShiroAutoLoginServlet.class.getName());
 	
 	public  void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -70,9 +68,9 @@ public class ShiroAutoLoginServlet
 				if (apiSecurityManager.getDaemonSubject() == null)
 				{
 					HTTPAuthenticationBasic hab = (HTTPAuthenticationBasic) hra.getHTTPAuthentication();
-					log.info("Authentication:" + hab);
-					log.info("hra:" + hra.getContentType());
-					log.info("Content:" + hra.getContent());
+//					log.info("Authentication:" + hab);
+//					log.info("hra:" + hra.getContentType());
+//					log.info("Content:" + hra.getContent());
 					AppIDDAO appIDDAO = null;
 					
 					if (!SharedStringUtil.isEmpty(hra.getContent()))
