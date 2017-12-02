@@ -37,7 +37,7 @@ implements AppID<String>, HostAuthenticationToken, RememberMeAuthenticationToken
 	
 	public JWTAuthenticationToken(JWTToken jwtToken, String host, boolean rememberMe)
 	{
-		SharedUtil.checkIfNulls("JWTToken can not be null", jwtToken);
+		SharedUtil.checkIfNulls("JWTToken can not be null", jwtToken, jwtToken.getJWT(), jwtToken.getToken(), jwtToken.getJWT().getPayload(), jwtToken.getJWT().getPayload().getSubjectID());
 		this.jwtToken = jwtToken;
 		this.host = host;
 		this.rememberMe = rememberMe;
