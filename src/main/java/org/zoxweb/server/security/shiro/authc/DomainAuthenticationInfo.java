@@ -22,9 +22,9 @@ public class DomainAuthenticationInfo
     extends SimpleAuthenticationInfo
 {
 
-	public DomainAuthenticationInfo(Object principal, String userID, Object credentials, String realmName, String domainID, String applicationID)
+	public DomainAuthenticationInfo(Object principal, String userID, Object credentials, String realmName, String domainID, String applicationID, String jwtSubjectID)
     {
-		 this.principals = new DomainPrincipalCollection(principal, userID, realmName, domainID, applicationID);
+		 this.principals = new DomainPrincipalCollection(principal, userID, realmName, domainID, applicationID, jwtSubjectID);
 	     this.credentials = credentials;   
 	}
 	

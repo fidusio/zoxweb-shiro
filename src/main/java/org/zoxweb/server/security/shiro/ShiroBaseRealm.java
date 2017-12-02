@@ -140,7 +140,7 @@ public abstract class ShiroBaseRealm
 	        	throw new UnknownAccountException("No account found for user [" + userID + "]");
 	        }
 
-	        return new DomainAuthenticationInfo(userName, userID, password, getName(), domainID, applicationID);
+	        return new DomainAuthenticationInfo(userName, userID, password, getName(), domainID, applicationID, null);
 	    }	
 		 throw new AuthenticationException("Not a domain info");
 	}

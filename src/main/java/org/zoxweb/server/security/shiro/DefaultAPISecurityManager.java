@@ -19,6 +19,7 @@ import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.security.CryptoUtil;
 import org.zoxweb.server.security.KeyMakerProvider;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
+import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APICredentialsDAO;
 import org.zoxweb.shared.api.APIDataStore;
 import org.zoxweb.shared.api.APISecurityManager;
@@ -633,6 +634,22 @@ public class DefaultAPISecurityManager
 	    }   
 		return currentUser;
 	}
+	
+	
+	public Subject login(JWTAuthenticationToken jwtAuthenticationToken) 
+	{
+		Subject currentUser = SecurityUtils.getSubject();
+	    if (!currentUser.isAuthenticated())
+	    {
+	        //collect user principals and credentials in a gui specific manner
+	        //such as username/password html form, X509 certificate, OpenID, etc.
+	        //We'll use the username/password example here since it is the most common.
+	    	
+	        currentUser.login(jwtAuthenticationToken);
+	        //log.info(""+SecurityUtils.getSubject().getPrincipals().getClass());
+	    }   
+		return currentUser;
+	}
 
 	@Override
 	public void logout() 
@@ -645,6 +662,6 @@ public class DefaultAPISecurityManager
 	public String currentJWTSubjectID() throws AccessException
 	{
 		// TODO Auto-generated method stub
-		return ShiroUtil.subjectJWT();
+		return ShiroUtil.subjectJWTID();
 	}	
 }

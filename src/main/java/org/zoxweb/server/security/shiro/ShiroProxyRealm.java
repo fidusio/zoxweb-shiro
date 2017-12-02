@@ -102,7 +102,7 @@ public class ShiroProxyRealm extends AuthorizingRealm
 					log.info("Credential info found for " + domainUser);
 				}
 				
-				ret = new DomainAuthenticationInfo(token.getPrincipal(), userID, token.getCredentials(), getName(), domainID, applicationID);
+				ret = new DomainAuthenticationInfo(token.getPrincipal(), userID, token.getCredentials(), getName(), domainID, applicationID, null);
 				//log.info("Credential info found for " + domainUser);
 				return ret;
 				

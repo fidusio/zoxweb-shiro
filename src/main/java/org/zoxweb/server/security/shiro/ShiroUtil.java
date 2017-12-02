@@ -99,9 +99,27 @@ public class ShiroUtil
 	}
 	
 	
-	public static String subjectJWT()
+	public static String subjectJWTID()
 	{
-		return null;
+		try
+        {
+			Subject subject = SecurityUtils.getSubject();
+			
+			if (subject.isAuthenticated())
+			{
+				if (subject.getPrincipals() instanceof DomainPrincipalCollection)
+				{
+					return ((DomainPrincipalCollection)subject.getPrincipals()).getJWSubjectID();
+				}	
+			}
+			
+			throw new AccessException("Subject not authenticated");
+		}
+		catch (ShiroException e)
+        {
+			throw new AccessException(e.getMessage());
+		}
+		
 	}
 	
 	public static String subjectUserID()

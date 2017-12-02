@@ -28,6 +28,7 @@ public class DomainPrincipalCollection
 	protected String domain_id;
 	protected String application_id;
 	protected String user_id;
+	protected String token_subject_id;
 
 	/**
      *
@@ -37,12 +38,13 @@ public class DomainPrincipalCollection
 	 * @param domainID
 	 * @param applicationID
 	 */
-	public DomainPrincipalCollection(Object principal, String userID, String realmName, String domainID, String applicationID)
+	public DomainPrincipalCollection(Object principal, String userID, String realmName, String domainID, String applicationID, String jwtSubjectID)
     {
 		super(principal, realmName);
 		domain_id = SharedStringUtil.toLowerCase(domainID);
 		application_id = SharedStringUtil.toLowerCase(applicationID);
 		user_id = userID;
+		token_subject_id = jwtSubjectID;
     }
 	
     public String getDomainID()
@@ -96,5 +98,11 @@ public class DomainPrincipalCollection
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public String getJWSubjectID()
+	{
+		return token_subject_id;
+	}
+	
 
 }
