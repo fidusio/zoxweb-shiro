@@ -98,6 +98,12 @@ public class ShiroUtil
 		}
 	}
 	
+	
+	public static String subjectJWT()
+	{
+		return null;
+	}
+	
 	public static String subjectUserID()
 		throws AccessException
     {

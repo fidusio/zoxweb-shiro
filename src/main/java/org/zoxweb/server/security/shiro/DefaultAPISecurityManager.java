@@ -344,20 +344,27 @@ public class DefaultAPISecurityManager
 	}
 
 	@Override
-	public final String currentSubjectID() {
+	public final String currentSubjectID()
+			throws AccessException
+	{
 		// TODO Auto-generated method stub
 		return (String) SecurityUtils.getSubject().getPrincipal();
 	}
 	
 	public final String currentDomainID()
+			throws AccessException
 	{
 		return ShiroUtil.subjectDomainID();
 	}
 	
 	public final String currentAppID()
+			throws AccessException
 	{
 		return ShiroUtil.subjectAppID();
 	}
+	
+	
+	
 	
 
 	@Override
@@ -632,5 +639,12 @@ public class DefaultAPISecurityManager
 	{
 		// TODO Auto-generated method stub
 		SecurityUtils.getSubject().logout();
+	}
+
+	@Override
+	public String currentJWTSubjectID() throws AccessException
+	{
+		// TODO Auto-generated method stub
+		return ShiroUtil.subjectJWT();
 	}	
 }
