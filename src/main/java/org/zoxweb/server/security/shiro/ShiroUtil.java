@@ -42,6 +42,7 @@ import org.zoxweb.shared.security.shiro.ShiroNVEntityCRUDs;
 import org.zoxweb.shared.security.shiro.ShiroTokenReplacement;
 import org.zoxweb.shared.util.CRUD;
 import org.zoxweb.shared.util.Const;
+import org.zoxweb.shared.util.GetValue;
 import org.zoxweb.shared.util.NVEntity;
 import org.zoxweb.shared.util.SharedStringUtil;
 import org.zoxweb.shared.util.SharedUtil;
@@ -260,7 +261,7 @@ public class ShiroUtil
 	public static void checkPermission(String permission, ShiroTokenReplacement str)
         throws NullPointerException, AccessException
     {
-		checkPermission( SecurityUtils.getSubject(), permission, str);
+		checkPermission(SecurityUtils.getSubject(), permission, str);
 	}
 	
 	public static void checkPermission(Subject subject, String permission, ShiroTokenReplacement str)
@@ -296,7 +297,7 @@ public class ShiroUtil
 		{
 			try
             {
-				subject.checkPermission( SharedStringUtil.toLowerCase(permission));
+				subject.checkPermission(SharedStringUtil.toLowerCase(permission));
 			}
 			catch (ShiroException e)
             {
@@ -346,7 +347,14 @@ public class ShiroUtil
 		throws NullPointerException, AccessException
     {
 		SharedUtil.checkIfNulls("Null parameters not allowed", subject, permission);
-		return subject.isPermitted( SharedStringUtil.toLowerCase(permission));
+		return subject.isPermitted(SharedStringUtil.toLowerCase(permission));
+	}
+	
+	public boolean isPermitted(GetValue<String> gv)
+			throws NullPointerException, AccessException
+	{
+		SharedUtil.checkIfNulls("Null parameters not allowed", gv, gv.getValue());
+		return isPermitted(gv.getValue());
 	}
 
 	public static Object lookupSessionAttribute(Object key)

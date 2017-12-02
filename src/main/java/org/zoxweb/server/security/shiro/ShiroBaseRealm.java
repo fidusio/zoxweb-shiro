@@ -30,14 +30,17 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.security.shiro.authc.DomainAuthenticationInfo;
 import org.zoxweb.server.security.shiro.authc.DomainPrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
 import org.zoxweb.shared.api.APIDataStore;
+import org.zoxweb.shared.api.APISecurityManager;
 import org.zoxweb.shared.crypto.PasswordDAO;
 import org.zoxweb.shared.data.AppIDDAO;
 import org.zoxweb.shared.db.QueryMatchString;
 import org.zoxweb.shared.security.AccessException;
+import org.zoxweb.shared.security.model.SecurityModel;
 import org.zoxweb.shared.security.shiro.ShiroAssociationDAO;
 import org.zoxweb.shared.security.shiro.ShiroAssociationType;
 import org.zoxweb.shared.security.shiro.ShiroCollectionAssociationDAO;
@@ -50,7 +53,9 @@ import org.zoxweb.shared.security.shiro.ShiroRulesManager;
 import org.zoxweb.shared.security.shiro.ShiroSubjectDAO;
 import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.Const.RelationalOperator;
+import org.zoxweb.shared.util.ResourceManager.Resource;
 import org.zoxweb.shared.util.MetaToken;
+import org.zoxweb.shared.util.ResourceManager;
 import org.zoxweb.shared.util.SharedUtil;
 
 public abstract class ShiroBaseRealm
@@ -62,6 +67,16 @@ public abstract class ShiroBaseRealm
 
 	protected boolean permissionsLookupEnabled = false;
 	
+	private APISecurityManager<Subject> apiSecurityManager;
+	
+	
+	public APISecurityManager<Subject> getAPISecurityManager() {
+		return apiSecurityManager != null ? apiSecurityManager :  ResourceManager.SINGLETON.lookup(Resource.API_SECURITY_MANAGER);
+	}
+
+	public void setAPISecurityManager(APISecurityManager<Subject> apiSecurityManager) {
+		this.apiSecurityManager = apiSecurityManager;
+	}
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals)
@@ -170,6 +185,7 @@ public abstract class ShiroBaseRealm
 	public ShiroRoleDAO addRole(ShiroRoleDAO role)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		getAPISecurityManager().checkPermissions(SecurityModel.Permission.ADD_ROLE.getValue());
 		return getDataStore().insert(role);
 	}
 
@@ -177,7 +193,7 @@ public abstract class ShiroBaseRealm
 	public ShiroRoleDAO deleteRole(ShiroRoleDAO role, boolean withPermissions)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		
+		getAPISecurityManager().checkPermissions(SecurityModel.Permission.DELETE_ROLE.getValue());
 		
 		getDataStore().delete(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, new QueryMatchString(RelationalOperator.EQUAL, role.getSubjectID(),AppIDDAO.Param.APP_ID));
 		return role;
@@ -215,12 +231,14 @@ public abstract class ShiroBaseRealm
 	public ShiroPermissionDAO addPermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		getAPISecurityManager().checkPermissions(SecurityModel.Permission.ADD_PERMISSION.getValue());
 		return getDataStore().insert(permission);
 	}
 
 	
 	public ShiroPermissionDAO deletePermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
+		getAPISecurityManager().checkPermissions(SecurityModel.Permission.DELETE_PERMISSION.getValue());
 		getDataStore().delete(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, new QueryMatchString(RelationalOperator.EQUAL, permission.getSubjectID(),AppIDDAO.Param.APP_ID));
 		return permission;
 	}
@@ -311,7 +329,7 @@ public abstract class ShiroBaseRealm
 			throws NullPointerException, IllegalArgumentException, AccessException
 	{
 		SharedUtil.checkIfNulls("Null permission id", roleID);
-		
+		log.info("RoleID:" + roleID);
 		
 		List<ShiroRoleDAO> ret = null;
 		if (getDataStore().isValidReferenceID(roleID))
@@ -331,4 +349,9 @@ public abstract class ShiroBaseRealm
 	}
 	
 	public abstract APIDataStore<?> getDataStore();
+	
+	public AuthorizationInfo lookupAuthorizationInfo(PrincipalCollection principals)
+	{
+		return getAuthorizationInfo(principals);
+	}
 }
