@@ -33,6 +33,7 @@ import org.zoxweb.shared.filters.BytesValueFilter;
 import org.zoxweb.shared.filters.ChainedFilter;
 import org.zoxweb.shared.filters.FilterType;
 import org.zoxweb.shared.security.AccessException;
+import org.zoxweb.shared.security.JWTToken;
 import org.zoxweb.shared.util.ArrayValues;
 import org.zoxweb.shared.util.CRUD;
 import org.zoxweb.shared.util.Const.LogicalOperator;
@@ -636,7 +637,7 @@ public class DefaultAPISecurityManager
 	}
 	
 	
-	public Subject login(JWTAuthenticationToken jwtAuthenticationToken) 
+	public Subject login(JWTToken jwtToken) 
 	{
 		Subject currentUser = SecurityUtils.getSubject();
 	    if (!currentUser.isAuthenticated())
@@ -645,7 +646,7 @@ public class DefaultAPISecurityManager
 	        //such as username/password html form, X509 certificate, OpenID, etc.
 	        //We'll use the username/password example here since it is the most common.
 	    	
-	        currentUser.login(jwtAuthenticationToken);
+	        currentUser.login(new JWTAuthenticationToken(jwtToken));
 	        //log.info(""+SecurityUtils.getSubject().getPrincipals().getClass());
 	    }   
 		return currentUser;
