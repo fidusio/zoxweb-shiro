@@ -1,10 +1,12 @@
 package org.zoxweb.server.security.shiro;
 
+import java.util.List;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
+
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
@@ -34,6 +36,14 @@ import org.zoxweb.shared.filters.ChainedFilter;
 import org.zoxweb.shared.filters.FilterType;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.JWTToken;
+import org.zoxweb.shared.security.shiro.ShiroAssociationDAO;
+import org.zoxweb.shared.security.shiro.ShiroAssociationType;
+import org.zoxweb.shared.security.shiro.ShiroCollectionAssociationDAO;
+import org.zoxweb.shared.security.shiro.ShiroDAO;
+import org.zoxweb.shared.security.shiro.ShiroPermissionDAO;
+import org.zoxweb.shared.security.shiro.ShiroRoleDAO;
+import org.zoxweb.shared.security.shiro.ShiroRoleGroupDAO;
+import org.zoxweb.shared.security.shiro.ShiroSubjectDAO;
 import org.zoxweb.shared.util.ArrayValues;
 import org.zoxweb.shared.util.CRUD;
 import org.zoxweb.shared.util.Const.LogicalOperator;
@@ -56,6 +66,7 @@ public class DefaultAPISecurityManager
 	protected static final transient Logger log = Logger.getLogger(DefaultAPISecurityManager.class.getName());
 	
 	private final AtomicReference<Subject> daemon = new AtomicReference<Subject>();
+	
 
 	@Override
 	public final Object encryptValue(APIDataStore<?> dataStore, NVEntity container, NVConfig nvc, NVBase<?> nvb, byte[] msKey)
@@ -121,6 +132,12 @@ public class DefaultAPISecurityManager
 		{
 			return nvb.getValue();
 		}
+	}
+	
+	
+	protected ShiroBaseRealm getShiroBaseRealm()
+	{
+		return ShiroUtil.getRealm(ShiroBaseRealm.class);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -664,5 +681,157 @@ public class DefaultAPISecurityManager
 	{
 		// TODO Auto-generated method stub
 		return ShiroUtil.subjectJWTID();
-	}	
+	}
+
+	@Override
+	public ShiroSubjectDAO addSubject(ShiroSubjectDAO subject)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return getShiroBaseRealm().addSubject(subject);
+	}
+
+	@Override
+	public ShiroSubjectDAO deleteSubject(ShiroSubjectDAO subject, boolean withRoles)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().deleteSubject(subject, withRoles);
+	}
+
+	@Override
+	public ShiroSubjectDAO updateSubject(ShiroSubjectDAO subject)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().updateSubject(subject);
+	}
+
+	@Override
+	public ShiroRoleDAO addRole(ShiroRoleDAO role)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().addRole(role);
+	}
+
+	@Override
+	public ShiroRoleDAO lookupRole(String roleID)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().lookupRole(roleID);
+	}
+
+	@Override
+	public ShiroRoleDAO deleteRole(ShiroRoleDAO role, boolean withPermissions)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().deleteRole(role, withPermissions);
+	}
+
+	@Override
+	public ShiroRoleDAO updateRole(ShiroRoleDAO role)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().updateRole(role);
+	}
+
+	@Override
+	public ShiroRoleGroupDAO addRoleGroup(ShiroRoleGroupDAO rolegroup)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().addRoleGroup(rolegroup);
+	}
+
+	@Override
+	public ShiroRoleGroupDAO deleteRoleGroup(ShiroRoleGroupDAO rolegroup)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().deleteRoleGroup(rolegroup);
+	}
+
+	@Override
+	public ShiroRoleGroupDAO updateRoleGroup(ShiroRoleGroupDAO rolegroup)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().updateRoleGroup(rolegroup);
+	}
+
+	@Override
+	public ShiroPermissionDAO addPermission(ShiroPermissionDAO permission)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().addPermission(permission);
+	}
+
+	@Override
+	public ShiroPermissionDAO lookupPermission(String permissionID)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().lookupPermission(permissionID);
+	}
+
+	@Override
+	public ShiroPermissionDAO deletePermission(ShiroPermissionDAO permission)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().deletePermission(permission);
+	}
+
+	@Override
+	public ShiroPermissionDAO updatePermission(ShiroPermissionDAO permission)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().updatePermission(permission);
+	}
+
+	@Override
+	public List<ShiroSubjectDAO> getAllShiroSubjects() throws AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().getAllShiroSubjects();
+	}
+
+	@Override
+	public List<ShiroRoleDAO> getAllShiroRoles() throws AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().getAllShiroRoles();
+	}
+
+	@Override
+	public List<ShiroRoleGroupDAO> getAllShiroRoleGroups() throws AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().getAllShiroRoleGroups();
+	}
+
+	@Override
+	public List<ShiroPermissionDAO> getAllShiroPermissions() throws AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().getAllShiroPermissions();
+	}
+
+	@Override
+	public ShiroSubjectDAO lookupSubject(String userName)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().lookupSubject(userName);
+	}
+
+	@Override
+	public ShiroCollectionAssociationDAO lookupShiroCollection(ShiroDAO shiroDao, ShiroAssociationType sat)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().lookupShiroCollection(shiroDao, sat);
+	}
+
+	@Override
+	public ShiroAssociationDAO addShiroAssociationDAO(ShiroAssociationDAO association)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return addShiroAssociationDAO(association);
+	}
+
+	@Override
+	public ShiroAssociationDAO removeShiroAssociationDAO(ShiroAssociationDAO association)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return  getShiroBaseRealm().removeShiroAssociationDAO(association);
+	}
+	
+	
 }
