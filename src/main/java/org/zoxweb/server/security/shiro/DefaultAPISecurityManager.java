@@ -37,6 +37,7 @@ import org.zoxweb.shared.filters.ChainedFilter;
 import org.zoxweb.shared.filters.FilterType;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.JWTToken;
+import org.zoxweb.shared.security.model.SecurityModel;
 import org.zoxweb.shared.security.shiro.ShiroAssociationDAO;
 import org.zoxweb.shared.security.shiro.ShiroAssociationRuleDAO;
 import org.zoxweb.shared.security.shiro.ShiroAssociationType;
@@ -706,6 +707,7 @@ public class DefaultAPISecurityManager
 	public ShiroRoleDAO addRole(ShiroRoleDAO role)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		checkPermissions(SecurityModel.Permission.ADD_ROLE.getValue());
 		return  getShiroBaseRealm().addRole(role);
 	}
 
@@ -713,6 +715,7 @@ public class DefaultAPISecurityManager
 	public ShiroRoleDAO lookupRole(String roleID)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		
 		return  getShiroBaseRealm().lookupRole(roleID);
 	}
 
@@ -720,6 +723,7 @@ public class DefaultAPISecurityManager
 	public ShiroRoleDAO deleteRole(ShiroRoleDAO role, boolean withPermissions)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		checkPermissions(SecurityModel.Permission.DELETE_ROLE.getValue());
 		return  getShiroBaseRealm().deleteRole(role, withPermissions);
 	}
 
@@ -727,6 +731,7 @@ public class DefaultAPISecurityManager
 	public ShiroRoleDAO updateRole(ShiroRoleDAO role)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		checkPermissions(SecurityModel.Permission.UPDATE_ROLE.getValue());
 		return  getShiroBaseRealm().updateRole(role);
 	}
 
@@ -755,6 +760,7 @@ public class DefaultAPISecurityManager
 	public ShiroPermissionDAO addPermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		checkPermissions(SecurityModel.Permission.ADD_PERMISSION.getValue());
 		return  getShiroBaseRealm().addPermission(permission);
 	}
 
@@ -769,6 +775,7 @@ public class DefaultAPISecurityManager
 	public ShiroPermissionDAO deletePermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		checkPermissions(SecurityModel.Permission.DELETE_PERMISSION.getValue());
 		return  getShiroBaseRealm().deletePermission(permission);
 	}
 
@@ -776,6 +783,7 @@ public class DefaultAPISecurityManager
 	public ShiroPermissionDAO updatePermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		checkPermissions(SecurityModel.Permission.UPTDATE_PERMISSION.getValue());
 		return  getShiroBaseRealm().updatePermission(permission);
 	}
 
@@ -867,7 +875,7 @@ public class DefaultAPISecurityManager
 	}
 
 	@Override
-	public final boolean hasPermimission(String permission)
+	public final boolean hasPermission(String permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
 		return ShiroUtil.isPermitted(permission);
