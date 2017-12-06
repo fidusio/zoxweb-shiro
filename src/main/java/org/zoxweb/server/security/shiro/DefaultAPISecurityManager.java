@@ -31,12 +31,14 @@ import org.zoxweb.shared.crypto.EncryptedKeyDAO;
 import org.zoxweb.shared.data.DataConst.SessionParam;
 import org.zoxweb.shared.data.MessageTemplateDAO;
 import org.zoxweb.shared.data.UserIDDAO;
+import org.zoxweb.shared.db.QueryMarker;
 import org.zoxweb.shared.filters.BytesValueFilter;
 import org.zoxweb.shared.filters.ChainedFilter;
 import org.zoxweb.shared.filters.FilterType;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.JWTToken;
 import org.zoxweb.shared.security.shiro.ShiroAssociationDAO;
+import org.zoxweb.shared.security.shiro.ShiroAssociationRuleDAO;
 import org.zoxweb.shared.security.shiro.ShiroAssociationType;
 import org.zoxweb.shared.security.shiro.ShiroCollectionAssociationDAO;
 import org.zoxweb.shared.security.shiro.ShiroDAO;
@@ -509,11 +511,7 @@ public class DefaultAPISecurityManager
 		return userID;
 	}
 	
-	public final void checkPermissions(String ...permissions)
-			 throws NullPointerException, AccessException
-	{
-		ShiroUtil.checkPermissions(permissions);
-	}
+	
 	
 
 	@Override
@@ -831,6 +829,64 @@ public class DefaultAPISecurityManager
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
 		return  getShiroBaseRealm().removeShiroAssociationDAO(association);
+	}
+
+
+	@Override
+	public void addShiroRule(ShiroAssociationRuleDAO sard) {
+		// TODO Auto-generated method stub
+		getShiroBaseRealm().addShiroRule(sard);
+	}
+
+
+	@Override
+	public void deleteShiroRule(ShiroAssociationRuleDAO sard) {
+		// TODO Auto-generated method stub
+		getShiroBaseRealm().deleteShiroRule(sard);
+	}
+
+
+	@Override
+	public void updateShiroRule(ShiroAssociationRuleDAO sard) {
+		// TODO Auto-generated method stub
+		getShiroBaseRealm().updateShiroRule(sard);
+	}
+
+
+	@Override
+	public List<ShiroAssociationRuleDAO> search(QueryMarker... queryCriteria) {
+		// TODO Auto-generated method stub
+		return getShiroBaseRealm().search(queryCriteria);
+	}
+
+	
+	public final void checkPermissions(String ...permissions)
+			 throws NullPointerException, IllegalArgumentException, AccessException
+	{
+		ShiroUtil.checkPermissions(permissions);
+	}
+
+	@Override
+	public final boolean hasPermimission(String permission)
+			throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return ShiroUtil.isPermitted(permission);
+	}
+
+
+	@Override
+	public final void checkRoles(String... roles) throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		ShiroUtil.checkRoles(roles);
+	}
+
+	/**
+	 * Check the id the suer has the role
+	 */
+	@Override
+	public final boolean hasRole(String role) throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		return SecurityUtils.getSubject().hasRole(role);
 	}
 	
 	
