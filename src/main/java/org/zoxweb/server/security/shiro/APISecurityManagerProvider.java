@@ -62,11 +62,11 @@ import org.zoxweb.shared.util.SharedStringUtil;
 import org.zoxweb.shared.util.SharedUtil;
 import org.zoxweb.shared.util.NVConfigEntity;
 
-public class DefaultAPISecurityManager
+public class APISecurityManagerProvider
 	implements  APISecurityManager<Subject>
 {
 	
-	protected static final transient Logger log = Logger.getLogger(DefaultAPISecurityManager.class.getName());
+	protected static final transient Logger log = Logger.getLogger(APISecurityManagerProvider.class.getName());
 	
 	private final AtomicReference<Subject> daemon = new AtomicReference<Subject>();
 	
