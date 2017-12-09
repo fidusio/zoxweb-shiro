@@ -315,8 +315,29 @@ public class ShiroUtil
 	public static void checkRoles(Subject subject, String ... roles)
         throws NullPointerException, AccessException
     {
+//		SharedUtil.checkIfNulls("Null parameters not allowed", subject, roles);
+//
+//		for (String role : roles)
+//		{
+//			try
+//            {
+//				subject.checkRole(SharedStringUtil.toLowerCase(role));
+//			}
+//			catch (ShiroException e)
+//            {
+//			    throw new AccessException( e.getMessage());
+//			}
+//		}
+		
+		checkRoles(false, subject, roles);
+	}
+	
+	
+	public static void checkRoles(boolean partial, Subject subject, String ... roles)
+	        throws NullPointerException, AccessException
+    {
 		SharedUtil.checkIfNulls("Null parameters not allowed", subject, roles);
-
+		int failureCount = 0;
 		for (String role : roles)
 		{
 			try
@@ -325,8 +346,15 @@ public class ShiroUtil
 			}
 			catch (ShiroException e)
             {
-			    throw new AccessException( e.getMessage());
+				failureCount++;
+				if (!partial)
+					throw new AccessException( e.getMessage());
 			}
+		}
+		
+		if (failureCount == roles.length)
+		{
+			throw new AccessException("All roles failed");
 		}
 	}
 	
@@ -334,26 +362,54 @@ public class ShiroUtil
 	public static void checkPermissions(String... permissions)
 	        throws NullPointerException, AccessException
 	    {
-			checkPermissions (SecurityUtils.getSubject(), permissions);
+			checkPermissions(SecurityUtils.getSubject(), permissions);
 		}
 		
-		public static void checkPermissions(Subject subject, String ... permissions)
+	public static void checkPermissions(Subject subject, String ...permissions)
+        throws NullPointerException, AccessException
+    {
+//		SharedUtil.checkIfNulls("Null parameters not allowed", subject, permissions);
+//
+//		for (String permission : permissions)
+//		{
+//			try
+//            {
+//				subject.checkPermission(SharedStringUtil.toLowerCase(permission));
+//			}
+//			catch (ShiroException e)
+//            {
+//			    throw new AccessException( e.getMessage());
+//			}
+//		}
+		checkPermissions(false, subject, permissions);
+	}
+	
+	public static void checkPermissions(boolean partial, Subject subject, String ...permissions)
 	        throws NullPointerException, AccessException
-	    {
-			SharedUtil.checkIfNulls("Null parameters not allowed", subject, permissions);
+    {
+		SharedUtil.checkIfNulls("Null parameters not allowed", subject, permissions);
 
-			for (String permission : permissions)
-			{
-				try
-	            {
-					subject.checkPermission(SharedStringUtil.toLowerCase(permission));
-				}
-				catch (ShiroException e)
-	            {
-				    throw new AccessException( e.getMessage());
-				}
+		int failureCount = 0;
+		for (String permission : permissions)
+		{
+			try
+            {
+				subject.checkPermission(SharedStringUtil.toLowerCase(permission));
+			}
+			catch (ShiroException e)
+            {
+				failureCount++;
+				if (!partial)
+					throw new AccessException(e.getMessage());
 			}
 		}
+		
+		if (failureCount == permissions.length)
+		{
+			throw new AccessException("All permissions failed");
+		}
+	}
+	
 
 	public static boolean isPermitted(String permission) 
         throws NullPointerException, AccessException

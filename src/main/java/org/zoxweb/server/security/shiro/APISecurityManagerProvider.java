@@ -843,6 +843,23 @@ public class APISecurityManagerProvider
 	@Override
 	public void addShiroRule(ShiroAssociationRuleDAO sard) {
 		// TODO Auto-generated method stub
+		SharedUtil.checkIfNulls("Null ShiroAssociationRuleDAO", sard, sard.getAssociationType());
+		switch(sard.getAssociationType())
+		{
+		case PERMISSION_TO_ROLE:
+			break;
+		case PERMISSION_TO_SUBJECT:
+			break;
+		case ROLEGROUP_TO_SUBJECT:
+			break;
+		case ROLE_TO_ROLEGROUP:
+			break;
+		case ROLE_TO_SUBJECT:
+			//checkRole()
+			break;
+		
+		
+		}
 		getShiroBaseRealm().addShiroRule(sard);
 	}
 
@@ -871,7 +888,14 @@ public class APISecurityManagerProvider
 	public final void checkPermissions(String ...permissions)
 			 throws NullPointerException, IllegalArgumentException, AccessException
 	{
-		ShiroUtil.checkPermissions(permissions);
+		checkPermissions(false, permissions);
+	}
+	
+	
+	public final void checkPermissions(boolean partial, String ...permissions)
+			 throws NullPointerException, IllegalArgumentException, AccessException
+	{
+		ShiroUtil.checkPermissions(partial, SecurityUtils.getSubject(), permissions);
 	}
 
 	@Override
@@ -885,7 +909,12 @@ public class APISecurityManagerProvider
 	@Override
 	public final void checkRoles(String... roles) throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		ShiroUtil.checkRoles(roles);
+		checkRoles(false, roles);
+	}
+	
+	public final void checkRoles(boolean partial, String... roles) throws NullPointerException, IllegalArgumentException, AccessException {
+		// TODO Auto-generated method stub
+		ShiroUtil.checkRoles(partial, SecurityUtils.getSubject(), roles);
 	}
 
 	/**
