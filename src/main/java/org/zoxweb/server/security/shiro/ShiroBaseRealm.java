@@ -30,14 +30,18 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.zoxweb.server.api.APIAppManagerProvider;
 import org.zoxweb.server.security.shiro.authc.DomainAuthenticationInfo;
 import org.zoxweb.server.security.shiro.authc.DomainPrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
 import org.zoxweb.shared.api.APIDataStore;
+import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.api.APISecurityManager;
 import org.zoxweb.shared.crypto.PasswordDAO;
 import org.zoxweb.shared.data.AppIDDAO;
+import org.zoxweb.shared.data.UserIDDAO;
 import org.zoxweb.shared.db.QueryMatchString;
 import org.zoxweb.shared.security.AccessException;
 
@@ -52,6 +56,7 @@ import org.zoxweb.shared.security.shiro.ShiroRoleGroupDAO;
 import org.zoxweb.shared.security.shiro.ShiroRulesManager;
 import org.zoxweb.shared.security.shiro.ShiroSubjectDAO;
 import org.zoxweb.shared.util.Const;
+import org.zoxweb.shared.util.GetValue;
 import org.zoxweb.shared.util.Const.RelationalOperator;
 import org.zoxweb.shared.util.ResourceManager.Resource;
 import org.zoxweb.shared.util.MetaToken;
@@ -185,14 +190,14 @@ public abstract class ShiroBaseRealm
 	public ShiroRoleDAO addRole(ShiroRoleDAO role)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		return getDataStore().insert(role);
+		return getAPIDataStore().insert(role);
 	}
 
 	
 	public ShiroRoleDAO deleteRole(ShiroRoleDAO role, boolean withPermissions)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		getDataStore().delete(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, new QueryMatchString(RelationalOperator.EQUAL, role.getSubjectID(), AppIDDAO.Param.SUBJECT_ID));
+		getAPIDataStore().delete(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, new QueryMatchString(RelationalOperator.EQUAL, role.getSubjectID(), AppIDDAO.Param.SUBJECT_ID));
 		return role;
 	}
 
@@ -200,7 +205,7 @@ public abstract class ShiroBaseRealm
 	public ShiroRoleDAO updateRole(ShiroRoleDAO role)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		return getDataStore().update(role);
+		return getAPIDataStore().update(role);
 	}
 
 	
@@ -228,13 +233,13 @@ public abstract class ShiroBaseRealm
 	public ShiroPermissionDAO addPermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		return getDataStore().insert(permission);
+		return getAPIDataStore().insert(permission);
 	}
 
 	
 	public ShiroPermissionDAO deletePermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
-		getDataStore().delete(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, new QueryMatchString(RelationalOperator.EQUAL, permission.getSubjectID(),AppIDDAO.Param.SUBJECT_ID));
+		getAPIDataStore().delete(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, new QueryMatchString(RelationalOperator.EQUAL, permission.getSubjectID(),AppIDDAO.Param.SUBJECT_ID));
 		return permission;
 	}
 
@@ -242,7 +247,7 @@ public abstract class ShiroBaseRealm
 	public ShiroPermissionDAO updatePermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		return getDataStore().update(permission);
+		return getAPIDataStore().update(permission);
 	}
 
 	
@@ -303,13 +308,13 @@ public abstract class ShiroBaseRealm
 		SharedUtil.checkIfNulls("Null permission id", permissionID);
 			
 		List<ShiroPermissionDAO> ret = null;
-		if (getDataStore().isValidReferenceID(permissionID))
+		if (getAPIDataStore().isValidReferenceID(permissionID))
 		{
-			ret = getDataStore().search(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, permissionID, MetaToken.REFERENCE_ID));
+			ret = getAPIDataStore().search(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, permissionID, MetaToken.REFERENCE_ID));
 		}
 		else
 		{
-			ret = getDataStore().search(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, permissionID, AppIDDAO.Param.SUBJECT_ID));
+			ret = getAPIDataStore().search(ShiroPermissionDAO.NVC_SHIRO_PERMISSION_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, permissionID, AppIDDAO.Param.SUBJECT_ID));
 		}
 		
 		if (ret != null && ret.size() == 1)
@@ -327,13 +332,13 @@ public abstract class ShiroBaseRealm
 		log.info("RoleID:" + roleID);
 		
 		List<ShiroRoleDAO> ret = null;
-		if (getDataStore().isValidReferenceID(roleID))
+		if (getAPIDataStore().isValidReferenceID(roleID))
 		{
-			ret = getDataStore().search(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, roleID, MetaToken.REFERENCE_ID));
+			ret = getAPIDataStore().search(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, roleID, MetaToken.REFERENCE_ID));
 		}
 		else
 		{
-			ret = getDataStore().search(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, roleID, AppIDDAO.Param.SUBJECT_ID));
+			ret = getAPIDataStore().search(ShiroRoleDAO.NVC_SHIRO_ROLE_DAO, null, new QueryMatchString(RelationalOperator.EQUAL, roleID, AppIDDAO.Param.SUBJECT_ID));
 		}
 		
 		if (ret != null && ret.size() == 1)
@@ -343,10 +348,39 @@ public abstract class ShiroBaseRealm
 		return null;
 	}
 	
-	public abstract APIDataStore<?> getDataStore();
+	public abstract APIDataStore<?> getAPIDataStore();
 	
 	public AuthorizationInfo lookupAuthorizationInfo(PrincipalCollection principals)
 	{
 		return getAuthorizationInfo(principals);
+	}
+	
+	public  UserIDDAO lookupUserID(String subjectID, String ...params)
+			throws NullPointerException, IllegalArgumentException, AccessException, APIException
+	{
+		return APIAppManagerProvider.lookupUserID(getAPIDataStore(), subjectID, params);
+	}
+	
+	public  UserIDDAO lookupUserID(GetValue<String> subjectID, String ...params)
+			throws NullPointerException, IllegalArgumentException, AccessException
+	{
+		SharedUtil.checkIfNulls("DB or user ID null", subjectID, subjectID.getValue());
+		return lookupUserID(subjectID.getValue(), params);
+	}
+	
+	
+	
+	
+	public void clearUserCache(String userSubjectID)
+	{
+		if (userSubjectID != null)
+		{
+			UserIDDAO userID = lookupUserID(userSubjectID);
+			if (userID != null)
+			{
+				log.info("we must clear the autorizationinfo of " + userID.getPrimaryEmail());
+				clearCachedAuthorizationInfo(new SimplePrincipalCollection(userID.getPrimaryEmail(), getName()));
+			}
+		}
 	}
 }
