@@ -9,6 +9,7 @@ import org.zoxweb.server.security.CryptoUtil;
 import org.zoxweb.server.security.JWTProvider;
 
 import org.zoxweb.shared.crypto.PasswordDAO;
+import org.zoxweb.shared.security.JWT;
 import org.zoxweb.shared.util.SharedStringUtil;
 
 public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
@@ -55,7 +56,18 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 			}
 			else if (info.getCredentials() instanceof byte[] && token instanceof JWTAuthenticationToken)
 			{
-				JWTProvider.SINGLETON.decodeJWT((byte[]) info.getCredentials(), (String)token.getCredentials());
+				JWT jwt = JWTProvider.SINGLETON.decodeJWT((byte[]) info.getCredentials(), (String)token.getCredentials());
+				if (info instanceof DomainAuthenticationInfo)
+				{
+					DomainAuthenticationInfo dai = (DomainAuthenticationInfo) info;
+					DomainPrincipalCollection dpc =	(DomainPrincipalCollection) dai.getPrincipals();
+					// if the token is not matching the domain id and app id we have a problem 
+					if ( !(dpc.getDomainID().equalsIgnoreCase(jwt.getPayload().getDomainID()) && 
+						 dpc.getAppID().equalsIgnoreCase(jwt.getPayload().getAppID())))
+					{
+						return false;
+					}
+				}
 				return true;
 			}
 		}
