@@ -20,7 +20,6 @@ import org.apache.shiro.subject.Subject;
 
 import org.zoxweb.server.security.CryptoUtil;
 import org.zoxweb.server.security.KeyMakerProvider;
-import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APICredentialsDAO;
 import org.zoxweb.shared.api.APIDataStore;
@@ -634,22 +633,7 @@ public class APISecurityManagerProvider
 	@Override
 	public Subject login(String subjectID, String credentials, String domainID, String appID, boolean autoLogin) 
 	{
-		Subject currentUser = SecurityUtils.getSubject();
-	    if (!currentUser.isAuthenticated() )
-	    {
-	        //collect user principals and credentials in a gui specific manner
-	        //such as username/password html form, X509 certificate, OpenID, etc.
-	        //We'll use the username/password example here since it is the most common.
-	    	DomainUsernamePasswordToken token = new DomainUsernamePasswordToken(subjectID, credentials, false, null, domainID, appID);
-	        token.setAutoAuthenticationEnabled(autoLogin);
-
-	        //this is all you have to do to support 'remember me' (no config - built in!):
-	        token.setRememberMe(true);
-
-	        currentUser.login(token);
-	        log.info(""+SecurityUtils.getSubject().getPrincipals().getClass());
-	    }   
-		return currentUser;
+		return ShiroUtil.loginSubject(subjectID, credentials, domainID, appID, autoLogin);
 	}
 	
 	

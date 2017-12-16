@@ -77,23 +77,51 @@ public class ShiroUtil
 		return false;
 	}
 
-	public static Subject loginSubject(String domain, String realm, String username, String password)
-		throws ShiroException
-    {
+//	public static Subject loginSubject(String domain, String realm, String username, String password)
+//		throws ShiroException
+//    {
+//		try
+//        {
+//			Subject subject = SecurityUtils.getSubject();
+//			
+//			if (!subject.isAuthenticated())
+//			{
+//	            UsernamePasswordToken token = new DomainUsernamePasswordToken(username, password, false, null, domain);
+//	            subject.login(token);
+//			}
+//
+//			return subject;
+//		}
+//		catch (ShiroException e)
+//        {
+//			throw new AccessException(e.getMessage());
+//		}
+//	}
+	
+	
+	public static Subject loginSubject(String subjectID, String credentials, String domainID, String appID, boolean autoLogin) 
+	{
 		try
-        {
-			Subject subject = SecurityUtils.getSubject();
-			
-			if (!subject.isAuthenticated())
-			{
-	            UsernamePasswordToken token = new DomainUsernamePasswordToken(username, password, false, null, domain);
-	            subject.login(token);
-			}
-
-			return subject;
+		{
+			Subject currentUser = SecurityUtils.getSubject();
+		    if (!currentUser.isAuthenticated() )
+		    {
+		        //collect user principals and credentials in a gui specific manner
+		        //such as username/password html form, X509 certificate, OpenID, etc.
+		        //We'll use the username/password example here since it is the most common.
+		    	DomainUsernamePasswordToken token = new DomainUsernamePasswordToken(subjectID, credentials, false, null, domainID, appID);
+		        token.setAutoAuthenticationEnabled(autoLogin);
+	
+		        //this is all you have to do to support 'remember me' (no config - built in!):
+		        token.setRememberMe(true);
+	
+		        currentUser.login(token);
+		       
+		    }   
+			return currentUser;
 		}
 		catch (ShiroException e)
-        {
+		{
 			throw new AccessException(e.getMessage());
 		}
 	}

@@ -29,8 +29,11 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.http.HTTPRequestAttributes;
 import org.zoxweb.server.http.servlet.HTTPServletUtil;
+import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APIError;
+import org.zoxweb.shared.http.HTTPAuthentication;
+import org.zoxweb.shared.http.HTTPAuthenticationBasic;
 import org.zoxweb.shared.http.HTTPMethod;
 import org.zoxweb.shared.http.HTTPStatusCode;
 import org.zoxweb.shared.security.AccessException;
@@ -144,6 +147,26 @@ public abstract class ShiroBaseServlet
                 		
                 	}
                 }
+                else
+                {
+                	// maybe base 64 authentication
+                	try
+                	{
+                		HTTPAuthentication httpAuth = hra.getHTTPAuthentication();
+                		if (httpAuth != null && httpAuth instanceof HTTPAuthenticationBasic)
+                		{
+                			HTTPAuthenticationBasic basic = (HTTPAuthenticationBasic) httpAuth;
+                			String domainID = SharedUtil.getValue(hra.getHeaders().get("domain_id"));
+                			String appID = SharedUtil.getValue(hra.getHeaders().get("api_id"));
+                			ShiroUtil.loginSubject(basic.getUser(), basic.getPassword(), domainID, appID, false);
+                		}
+                	}
+                	catch(Exception e)
+                	{
+                		
+                	}
+                }
+                
 
                 
                 HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, DEFAULT_API_ERROR);
