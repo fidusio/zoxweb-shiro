@@ -32,12 +32,14 @@ import org.zoxweb.server.http.servlet.HTTPServletUtil;
 import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APIError;
+import org.zoxweb.shared.data.AppIDDAO;
 import org.zoxweb.shared.http.HTTPAuthentication;
 import org.zoxweb.shared.http.HTTPAuthenticationBasic;
 import org.zoxweb.shared.http.HTTPMethod;
 import org.zoxweb.shared.http.HTTPStatusCode;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.JWTToken;
+import org.zoxweb.shared.util.AppIDURI;
 import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.Const.Bool;
 import org.zoxweb.shared.util.SharedUtil;
@@ -53,15 +55,18 @@ public abstract class ShiroBaseServlet
     
     public static final String SECURITY_CHECK = "SECURITY_CHECK";
     public static final String AUTO_LOGOUT = "AUTO_LOGOUT";
+    public static final String APP_ID_IN_PATH = "APP_ID_IN_PATH";
     protected boolean isSecurityCheckRequired = false;
     protected boolean isAutoLogout = false;
+    protected boolean isAppIDInPath = false;
     
     public void init(ServletConfig config)
             throws ServletException
     {
     	super.init(config);
     	isSecurityCheckRequired = config.getInitParameter(SECURITY_CHECK) != null ? Bool.lookupValue(config.getInitParameter(SECURITY_CHECK)) : false;
-    	isAutoLogout = config.getInitParameter(SECURITY_CHECK) != null ? Bool.lookupValue(config.getInitParameter(AUTO_LOGOUT)) : false;
+    	isAutoLogout = config.getInitParameter(AUTO_LOGOUT) != null ? Bool.lookupValue(config.getInitParameter(AUTO_LOGOUT)) : false;
+    	isAppIDInPath = config.getInitParameter(APP_ID_IN_PATH) != null ? Bool.lookupValue(config.getInitParameter(APP_ID_IN_PATH)) : false;
     	log.info("isSecurityCheckRequired:"+isSecurityCheckRequired+",isAutoLogout:"+isAutoLogoutEnabled());
     }
     
@@ -156,8 +161,15 @@ public abstract class ShiroBaseServlet
                 		if (httpAuth != null && httpAuth instanceof HTTPAuthenticationBasic)
                 		{
                 			HTTPAuthenticationBasic basic = (HTTPAuthenticationBasic) httpAuth;
-                			String domainID = SharedUtil.getValue(hra.getHeaders().get("domain_id"));
-                			String appID = SharedUtil.getValue(hra.getHeaders().get("api_id"));
+                			
+                			
+                			AppIDDAO appIDDAO = null;
+                			if(isAppIDInPath)
+                			{
+                				appIDDAO = AppIDURI.parse(hra.getPathInfo()).getAppIDDAO();
+                			}
+                			String domainID = appIDDAO != null ? appIDDAO.getDomainID() : null;
+                			String appID = appIDDAO != null ? appIDDAO.getAppID() : null;
                 			ShiroUtil.loginSubject(basic.getUser(), basic.getPassword(), domainID, appID, false);
                 		}
                 	}
