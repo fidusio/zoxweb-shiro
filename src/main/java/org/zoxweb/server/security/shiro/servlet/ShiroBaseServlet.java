@@ -32,7 +32,6 @@ import org.zoxweb.server.http.servlet.HTTPServletUtil;
 import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APIError;
-import org.zoxweb.shared.data.AppIDDAO;
 import org.zoxweb.shared.http.HTTPAuthentication;
 import org.zoxweb.shared.http.HTTPAuthenticationBasic;
 import org.zoxweb.shared.http.HTTPMethod;
@@ -163,13 +162,13 @@ public abstract class ShiroBaseServlet
                 			HTTPAuthenticationBasic basic = (HTTPAuthenticationBasic) httpAuth;
                 			
                 			
-                			AppIDDAO appIDDAO = null;
-                			if(isAppIDInPath)
+                			AppIDURI appIDURI = hra.getAppIDURI();
+                			if(isAppIDInPath && appIDURI == null)
                 			{
-                				appIDDAO = AppIDURI.parse(hra.getPathInfo()).getAppIDDAO();
+                				return false;
                 			}
-                			String domainID = appIDDAO != null ? appIDDAO.getDomainID() : null;
-                			String appID = appIDDAO != null ? appIDDAO.getAppID() : null;
+                			String domainID = appIDURI != null ? appIDURI.getAppIDDAO().getDomainID() : null;
+                			String appID = appIDURI != null ? appIDURI.getAppIDDAO().getAppID() : null;
                 			ShiroUtil.loginSubject(basic.getUser(), basic.getPassword(), domainID, appID, false);
                 		}
                 	}
