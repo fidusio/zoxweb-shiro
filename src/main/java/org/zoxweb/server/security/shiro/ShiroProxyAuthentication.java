@@ -22,6 +22,7 @@ import org.zoxweb.server.http.HTTPCall;
 import org.zoxweb.server.security.SSLCheckDisabler;
 import org.zoxweb.server.util.GSONUtil;
 import org.zoxweb.shared.http.HTTPMessageConfig;
+import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.http.HTTPCallException;
 import org.zoxweb.shared.http.HTTPMethod;
 import org.zoxweb.shared.http.HTTPResponseData;
@@ -67,7 +68,7 @@ public class ShiroProxyAuthentication
 					log.info("\n" +json);
 					return GSONUtil.fromJSON( json, LoginStatusDAO.class);
 				}
-				catch (InstantiationException | IllegalAccessException | ClassNotFoundException e)
+				catch (AccessException | APIException e)
                 {
 					e.printStackTrace();
 				}
