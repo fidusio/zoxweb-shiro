@@ -32,6 +32,7 @@ import org.zoxweb.server.http.servlet.HTTPServletUtil;
 import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APIError;
+import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.http.HTTPAuthentication;
 import org.zoxweb.shared.http.HTTPAuthenticationBasic;
 import org.zoxweb.shared.http.HTTPMethod;
@@ -41,6 +42,7 @@ import org.zoxweb.shared.security.JWTToken;
 import org.zoxweb.shared.util.AppIDURI;
 import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.Const.Bool;
+import org.zoxweb.shared.util.ExceptionReason;
 import org.zoxweb.shared.util.SharedUtil;
 
 @SuppressWarnings("serial")
@@ -216,14 +218,47 @@ public abstract class ShiroBaseServlet
         {
             if (passSecurityCheckPoint(req, res))
             {
-                switch (req.getMethod().toUpperCase())
-                {
-                    case "PATCH":
-                        doPatch(req, res);
-                        break;
-                    default:
-                        super.service(req, res);
-                }
+            	try 
+            	{
+            		switch (req.getMethod().toUpperCase())
+            		{
+                    	case "PATCH":
+                    		doPatch(req, res);
+                    		break;
+                    	default:
+                    		super.service(req, res);
+            		}
+            	}
+            	catch(AccessException | APIException | NullPointerException | IllegalArgumentException e)
+            	{
+            		if (e instanceof ExceptionReason)
+            		{
+            			switch(((ExceptionReason) e).getReason())
+            			{
+						case ACCESS_DENIED:
+							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.FORBIDDEN, e.getMessage());
+							break;
+						case UNAUTHORIZED:
+							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, e.getMessage());
+							break;
+						case INCOMPLETE:
+							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, e.getMessage());
+							break;
+						case NOT_FOUND:
+							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.NOT_FOUND, e.getMessage());
+							break;
+						
+            			}
+            		}
+            		else if(e instanceof IllegalArgumentException)
+            		{
+            			HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, e.getMessage());
+            		}
+            		else if(e instanceof NullPointerException)
+            		{
+            			HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.INTERNAL_SERVER_ERROR, e.getMessage());
+            		}
+            	}
 
                 postService(req, res);
             }

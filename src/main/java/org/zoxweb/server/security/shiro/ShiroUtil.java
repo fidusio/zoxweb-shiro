@@ -42,6 +42,7 @@ import org.zoxweb.shared.security.shiro.ShiroNVEntityCRUDs;
 import org.zoxweb.shared.security.shiro.ShiroTokenReplacement;
 import org.zoxweb.shared.util.CRUD;
 import org.zoxweb.shared.util.Const;
+import org.zoxweb.shared.util.ExceptionReason.Reason;
 import org.zoxweb.shared.util.GetValue;
 import org.zoxweb.shared.util.NVEntity;
 import org.zoxweb.shared.util.SharedStringUtil;
@@ -428,13 +429,13 @@ public class ShiroUtil
             {
 				failureCount++;
 				if (!partial)
-					throw new AccessException(e.getMessage());
+					throw new AccessException(e.getMessage(), Reason.UNAUTHORIZED);
 			}
 		}
 		
 		if (failureCount == permissions.length)
 		{
-			throw new AccessException("All permissions failed");
+			throw new AccessException("All permissions failed", Reason.UNAUTHORIZED);
 		}
 	}
 	
