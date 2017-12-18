@@ -167,9 +167,13 @@ public abstract class ShiroBaseServlet
                 			{
                 				return false;
                 			}
+                			
+                			
+                			System.out.println(appIDURI.getAppIDDAO());
                 			String domainID = appIDURI != null ? appIDURI.getAppIDDAO().getDomainID() : null;
                 			String appID = appIDURI != null ? appIDURI.getAppIDDAO().getAppID() : null;
                 			ShiroUtil.loginSubject(basic.getUser(), basic.getPassword(), domainID, appID, false);
+                			return true;
                 		}
                 	}
                 	catch(Exception e)

@@ -113,7 +113,7 @@ public class ShiroUtil
 		        token.setAutoAuthenticationEnabled(autoLogin);
 	
 		        //this is all you have to do to support 'remember me' (no config - built in!):
-		        token.setRememberMe(true);
+		        token.setRememberMe(false);
 	
 		        currentUser.login(token);
 		       
