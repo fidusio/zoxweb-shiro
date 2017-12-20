@@ -110,6 +110,11 @@ public abstract class ShiroBaseServlet
     {
         return isAutoLogout;
     }
+    
+    protected boolean isAppIDInPath(HttpServletRequest req)
+    {
+    	return isAppIDInPath;
+    }
 
     /**
      * If the security check is required and the request or session is not authentication return false
@@ -165,13 +170,13 @@ public abstract class ShiroBaseServlet
                 			
                 			
                 			AppIDURI appIDURI = hra.getAppIDURI();
-                			if(isAppIDInPath && appIDURI == null)
+                			if(isAppIDInPath(req) && appIDURI == null)
                 			{
                 				return false;
                 			}
                 			
                 			
-                			System.out.println(appIDURI.getAppIDDAO());
+                			//System.out.println(appIDURI.getAppIDDAO());
                 			String domainID = appIDURI != null ? appIDURI.getAppIDDAO().getDomainID() : null;
                 			String appID = appIDURI != null ? appIDURI.getAppIDDAO().getAppID() : null;
                 			ShiroUtil.loginSubject(basic.getUser(), basic.getPassword(), domainID, appID, false);
