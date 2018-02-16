@@ -127,6 +127,13 @@
 		    <artifactId>commons-logging</artifactId>
 		    <version>${common.logging.version}</version>
 		</dependency>
+		
+		<dependency>
+		  <groupId>javax.cache</groupId>
+		  <artifactId>cache-api</artifactId>
+		  <version>${javax-cache.version}</version>
+		 
+		</dependency>
 
     </dependencies>
 
