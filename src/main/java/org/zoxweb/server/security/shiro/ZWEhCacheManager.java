@@ -15,6 +15,7 @@
  */
 package org.zoxweb.server.security.shiro;
 
+import java.io.Closeable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -23,6 +24,7 @@ import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.util.Destroyable;
 import org.apache.shiro.util.Initializable;
+import org.zoxweb.shared.util.ResourceManager;
 
 /**
  * @author mnael
@@ -32,50 +34,83 @@ public class ZWEhCacheManager
     extends EhCacheManager
     implements CacheManager, Initializable, Destroyable
 {
+	public static final String RESOURCE_NAME = "ZW_EH_CACHE_MANAGER";
 	
 	private static final Logger log = Logger.getLogger(ZWEhCacheManager.class.getName());
 	
-	private static final HashSet<EhCacheManager> CACHE_SET = new HashSet<>();
+	//private static final HashSet<EhCacheManager> CACHE_SET = new HashSet<>();
+	
+	private static final CacheObject CACHE_OBJECT = new CacheObject();
+	
+	
+	public static class CacheObject
+		implements Closeable
+	{
+		
+		final HashSet<EhCacheManager> cacheSet = new HashSet<>();
+		
+		CacheObject()
+		{
+			ResourceManager.SINGLETON.map(RESOURCE_NAME, this);
+		}
+		
+		void add(EhCacheManager eh)
+		{
+			synchronized(cacheSet)
+			{
+				cacheSet.add(eh);
+			}
+			
+		}
+
+		@Override
+		public void close() 
+		{
+			// TODO Auto-generated method stub
+		
+			
+			synchronized(cacheSet)
+	        {
+				log.info("Started destroy all " + cacheSet.size() + " to be destroyed.");
+			
+				cacheSet.iterator();
+				
+				Iterator<EhCacheManager> it = cacheSet.iterator();
+
+				while (it.hasNext())
+	            {
+					try
+	                {
+						EhCacheManager ecm = it.next();
+						ecm.destroy();
+						log.info("Destroyed:" + ecm);
+					}
+					catch(Exception e)
+	                {
+						e.printStackTrace();
+					}
+				}
+
+				cacheSet.clear();
+				log.info("Finished destroy all left size: " + cacheSet.size());
+			}
+			
+		}
+		
+		
+	}
+	
 	
 	public ZWEhCacheManager()
     {
 		super();
-
-		synchronized(CACHE_SET)
-        {
-			CACHE_SET.add(this);
-		}
-		
-		log.info("Created set size: " + CACHE_SET.size());
+		CACHE_OBJECT.add(this);	
+		log.info("Created set size: " + CACHE_OBJECT.cacheSet.size());
 	}
 	
 	public static void destroyAll()
     {
-		synchronized(CACHE_SET)
-        {
-			log.info("Started destroy all " + CACHE_SET.size() + " to be destroyed.");
-		
-			CACHE_SET.iterator();
-			
-			Iterator<EhCacheManager> it = CACHE_SET.iterator();
-
-			while (it.hasNext())
-            {
-				try
-                {
-					EhCacheManager ecm = it.next();
-					ecm.destroy();
-					log.info("Destroyed:" + ecm);
-				}
-				catch(Exception e)
-                {
-					e.printStackTrace();
-				}
-			}
-
-			CACHE_SET.clear();
-			log.info("Finished destroy all left size: " + CACHE_SET.size());
-		}
+		CACHE_OBJECT.close();
 	}
 
 }

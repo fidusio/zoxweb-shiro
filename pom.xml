@@ -131,8 +131,6 @@
 		<dependency>
 		  <groupId>javax.cache</groupId>
 		  <artifactId>cache-api</artifactId>
-		  <version>${javax-cache.version}</version>
-		 
 		</dependency>
 
     </dependencies>
