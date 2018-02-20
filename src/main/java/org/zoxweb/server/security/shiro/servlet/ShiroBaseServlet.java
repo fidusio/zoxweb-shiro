@@ -33,6 +33,8 @@ import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.api.APIException;
+import org.zoxweb.shared.data.ApplicationConfigDAO;
+import org.zoxweb.shared.data.ApplicationConfigDAO.ApplicationDefaultParam;
 import org.zoxweb.shared.http.HTTPAuthentication;
 import org.zoxweb.shared.http.HTTPAuthenticationBasic;
 import org.zoxweb.shared.http.HTTPHeaderName;
@@ -45,6 +47,7 @@ import org.zoxweb.shared.util.AppIDURI;
 import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.Const.Bool;
 import org.zoxweb.shared.util.ExceptionReason;
+import org.zoxweb.shared.util.ResourceManager;
 import org.zoxweb.shared.util.SharedUtil;
 
 @SuppressWarnings("serial")
@@ -195,11 +198,16 @@ public abstract class ShiroBaseServlet
                 
                 
                 
-                if (reqAuth == AuthType.NONE)
-                	
+                if (reqAuth == AuthType.NONE)  	
                 {
-                	res.reset();
-                	res.addHeader(HTTPHeaderName.WWW_AUTHENTICATE.getName(), "Basic realm=\"Access\", charset=\"UTF-8\"" );
+              
+                	ApplicationConfigDAO acd = ResourceManager.SINGLETON.lookup(ApplicationConfigDAO.RESOURCE_NAME);
+                	String realm = "domain_access";
+                	if (acd != null)
+                	{
+                		realm = acd.lookupValue(ApplicationDefaultParam.APPLICATION_HOST) != null ? acd.lookupValue(ApplicationDefaultParam.APPLICATION_HOST) : realm;
+                	}
+                	res.addHeader(HTTPHeaderName.WWW_AUTHENTICATE.getName(), "Basic realm=\"" + realm + "\", charset=\"UTF-8\"" );
                 	res.setStatus(HTTPStatusCode.UNAUTHORIZED.CODE);
                 }
                 else
