@@ -35,10 +35,12 @@ import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.http.HTTPAuthentication;
 import org.zoxweb.shared.http.HTTPAuthenticationBasic;
+import org.zoxweb.shared.http.HTTPHeaderName;
 import org.zoxweb.shared.http.HTTPMethod;
 import org.zoxweb.shared.http.HTTPStatusCode;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.JWTToken;
+import org.zoxweb.shared.security.SecurityConsts.AuthType;
 import org.zoxweb.shared.util.AppIDURI;
 import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.Const.Bool;
@@ -132,9 +134,11 @@ public abstract class ShiroBaseServlet
         if (isSecurityCheckRequired((HTTPMethod) SharedUtil.lookupEnum(HTTPMethod.values(), req.getMethod()), req))
         {
             Subject subject = SecurityUtils.getSubject();
+            AuthType reqAuth = AuthType.NONE;
 
             if (subject == null || !subject.isAuthenticated())
             {
+            	
                 log.info("security check required and user not authenticated");
                 // check authentication token first
                 // and try to login
@@ -155,7 +159,7 @@ public abstract class ShiroBaseServlet
                 	}
                 	catch(Exception e)
                 	{
-                		
+                		reqAuth = AuthType.BEARER;
                 	}
                 }
                 else
@@ -185,13 +189,23 @@ public abstract class ShiroBaseServlet
                 	}
                 	catch(Exception e)
                 	{
-                		
+                		reqAuth = AuthType.BASIC;
                 	}
                 }
                 
-
                 
-                HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, DEFAULT_API_ERROR);
+                
+                if (reqAuth == AuthType.NONE)
+                	
+                {
+                	res.reset();
+                	res.addHeader(HTTPHeaderName.WWW_AUTHENTICATE.getName(), "Basic realm=\"Access\", charset=\"UTF-8\"" );
+                	res.setStatus(HTTPStatusCode.UNAUTHORIZED.CODE);
+                }
+                else
+                {
+                	HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, DEFAULT_API_ERROR);
+                }
                 return false;
             }
         }
@@ -208,7 +222,7 @@ public abstract class ShiroBaseServlet
             if (subject != null)
             {
                 subject.logout();
-                log.info("AutoLogout invoked");
+                log.info("AutoLogout invoked");  
             }
         }
     }
