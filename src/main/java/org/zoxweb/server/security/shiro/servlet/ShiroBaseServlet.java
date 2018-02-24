@@ -16,7 +16,9 @@
 package org.zoxweb.server.security.shiro.servlet;
 
 import java.io.IOException;
-
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -31,6 +33,9 @@ import org.zoxweb.server.http.HTTPRequestAttributes;
 import org.zoxweb.server.http.servlet.HTTPServletUtil;
 import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
+import org.zoxweb.server.util.GSONUtil;
+import org.zoxweb.server.util.ReflectionUtil;
+import org.zoxweb.shared.annotation.ContentDataType;
 import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.data.ApplicationConfigDAO;
@@ -47,7 +52,12 @@ import org.zoxweb.shared.util.AppIDURI;
 import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.Const.Bool;
 import org.zoxweb.shared.util.ExceptionReason;
+import org.zoxweb.shared.util.ExceptionReason.Reason;
+import org.zoxweb.shared.util.NVEntity;
+import org.zoxweb.shared.util.NVGenericMap;
 import org.zoxweb.shared.util.ResourceManager;
+import org.zoxweb.shared.util.SharedBase64.Base64Type;
+import org.zoxweb.shared.util.SharedStringUtil;
 import org.zoxweb.shared.util.SharedUtil;
 
 @SuppressWarnings("serial")
@@ -65,6 +75,7 @@ public abstract class ShiroBaseServlet
     protected boolean isSecurityCheckRequired = false;
     protected boolean isAutoLogout = false;
     protected boolean isAppIDInPath = false;
+    protected  Map<HTTPMethod, ContentDataType> httpMethodCodecTypes = new HashMap<HTTPMethod, ContentDataType>();
     
     public void init(ServletConfig config)
             throws ServletException
@@ -74,6 +85,21 @@ public abstract class ShiroBaseServlet
     	isAutoLogout = config.getInitParameter(AUTO_LOGOUT) != null ? Bool.lookupValue(config.getInitParameter(AUTO_LOGOUT)) : false;
     	isAppIDInPath = config.getInitParameter(APP_ID_IN_PATH) != null ? Bool.lookupValue(config.getInitParameter(APP_ID_IN_PATH)) : false;
     	log.info("isSecurityCheckRequired:"+isSecurityCheckRequired+",isAutoLogout:"+isAutoLogoutEnabled());
+    	
+    
+    	Map<Method, ContentDataType> methodDataTypes = ReflectionUtil.extractFromClass(getClass(), ContentDataType.class);
+    	log.info("MethodDataTypes found:" + methodDataTypes.size());
+    	for(Map.Entry<Method,ContentDataType>  e : methodDataTypes.entrySet())
+    	{
+    		HTTPMethod hm = HTTPMethod.lookup(e.getKey().getName());
+    		if (hm != null)
+    		{
+    			httpMethodCodecTypes.put(hm, e.getValue());
+    		}
+    	}
+    	
+    	
+    	
     }
     
     
@@ -235,8 +261,9 @@ public abstract class ShiroBaseServlet
         }
     }
 
-    @Override
-    public void service(HttpServletRequest req, HttpServletResponse res)
+    @SuppressWarnings("unchecked")
+	@Override
+    protected void service(HttpServletRequest req, HttpServletResponse res)
         throws ServletException, IOException
     {
         long delta = System.nanoTime();
@@ -247,6 +274,49 @@ public abstract class ShiroBaseServlet
             {
             	try 
             	{
+            		
+            		HTTPMethod hm = HTTPMethod.lookup(req.getMethod());
+            		if (hm != null)
+            		{
+            			ContentDataType dct = httpMethodCodecTypes.get(hm);
+            			if (dct != null && dct.autoConvert())
+            			{
+            				HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
+            				if (!SharedStringUtil.isEmpty(hra.getContent()))
+            				{
+	            				Class<?> retType = dct.returnType();
+	            				try
+	            				{
+		            				if (retType.isAssignableFrom(NVEntity.class))
+		            				{
+		            					hra.setContentObject(GSONUtil.fromJSON(hra.getContent(), (Class<? extends NVEntity>) retType));
+		            				}
+		            				else if (retType.isAssignableFrom(NVGenericMap.class))
+		            				{
+		            					hra.setContentObject(GSONUtil.fromJSONGenericMap(hra.getContent(), null, Base64Type.DEFAULT));
+		            				}
+	            				}
+	            				catch(Exception e)
+	            				{
+	            					e.printStackTrace();
+	            					throw new APIException("Content not matching", Reason.INCOMPLETE);
+	            				}
+            				}
+            				else
+            				{
+            					// we have an empty content check if it is allowed
+            					if (dct.returnRequired())
+            					{
+            						// we have missing content generate error
+            						throw new APIException("Content empty", Reason.INCOMPLETE);
+            					}
+            				}
+            				
+            			}
+            			
+            		}
+            		
+            		
             		switch (req.getMethod().toUpperCase())
             		{
                     	case "PATCH":
