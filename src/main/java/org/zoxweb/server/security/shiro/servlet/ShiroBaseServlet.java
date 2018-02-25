@@ -35,7 +35,7 @@ import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.server.util.GSONUtil;
 import org.zoxweb.server.util.ReflectionUtil;
-import org.zoxweb.shared.annotation.ResourceAccessProp;
+import org.zoxweb.shared.annotation.DataProperties;
 import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.data.ApplicationConfigDAO;
@@ -74,7 +74,7 @@ public abstract class ShiroBaseServlet
     protected boolean isSecurityCheckRequired = false;
     protected boolean isAutoLogout = false;
     protected boolean isAppIDInPath = false;
-    protected  Map<HTTPMethod, ResourceAccessProp> httpResourceAccessProps = new HashMap<HTTPMethod, ResourceAccessProp>();
+    protected  Map<HTTPMethod, DataProperties> httpResourceAccessProps = new HashMap<HTTPMethod, DataProperties>();
     
     public void init(ServletConfig config)
             throws ServletException
@@ -86,9 +86,9 @@ public abstract class ShiroBaseServlet
     	log.info("isSecurityCheckRequired:"+isSecurityCheckRequired+",isAutoLogout:"+isAutoLogoutEnabled());
     	
     
-    	Map<Method, ResourceAccessProp> methodDataTypes = ReflectionUtil.extractFromClass(getClass(), ResourceAccessProp.class);
+    	Map<Method, DataProperties> methodDataTypes = ReflectionUtil.scanMethodsAnnotation(getClass(), DataProperties.class);
     	log.info("MethodDataTypes found:" + methodDataTypes.size());
-    	for(Map.Entry<Method,ResourceAccessProp>  e : methodDataTypes.entrySet())
+    	for(Map.Entry<Method,DataProperties>  e : methodDataTypes.entrySet())
     	{
     		HTTPMethod hm = HTTPMethod.lookup(e.getKey().getName());
     		if (hm != null)
@@ -96,6 +96,8 @@ public abstract class ShiroBaseServlet
     			httpResourceAccessProps.put(hm, e.getValue());
     		}
     	}
+    	
+    	
     	
     	
     	
@@ -110,7 +112,7 @@ public abstract class ShiroBaseServlet
     protected boolean isSecurityCheckRequired(HTTPMethod httpMethod, HttpServletRequest req)
     {
     	
-    	ResourceAccessProp rap = httpResourceAccessProps.get(httpMethod);
+    	DataProperties rap = httpResourceAccessProps.get(httpMethod);
     	if (rap != null && rap.authRequired())
     	{
     		return true;
@@ -225,6 +227,7 @@ public abstract class ShiroBaseServlet
                 	catch(Exception e)
                 	{
                 		reqAuth = AuthType.BASIC;
+                		log.info(hra.getPathInfo());
                 	}
                 }
                 
@@ -290,7 +293,7 @@ public abstract class ShiroBaseServlet
             	{
             		if (hm != null)
             		{
-            			ResourceAccessProp dct = httpResourceAccessProps.get(hm);
+            			DataProperties dct = httpResourceAccessProps.get(hm);
             			if (dct != null && dct.dataAutoConvert())
             			{
             				HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
