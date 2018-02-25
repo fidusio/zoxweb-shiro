@@ -631,13 +631,15 @@ public class APISecurityManagerProvider
 	}
 
 	@Override
-	public Subject login(String subjectID, String credentials, String domainID, String appID, boolean autoLogin) 
+	public Subject login(String subjectID, String credentials, String domainID, String appID, boolean autoLogin)
+			throws NullPointerException, IllegalArgumentException, AccessException
 	{
 		return ShiroUtil.loginSubject(subjectID, credentials, domainID, appID, autoLogin);
 	}
 	
 	
-	public Subject login(JWTToken jwtToken) 
+	public Subject login(JWTToken jwtToken)
+			throws NullPointerException, IllegalArgumentException, AccessException
 	{
 		Subject currentUser = SecurityUtils.getSubject();
 	    if (!currentUser.isAuthenticated())

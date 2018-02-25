@@ -35,7 +35,7 @@ import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.server.util.GSONUtil;
 import org.zoxweb.server.util.ReflectionUtil;
-import org.zoxweb.shared.annotation.ContentDataType;
+import org.zoxweb.shared.annotation.ResourceAccessProp;
 import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.data.ApplicationConfigDAO;
@@ -58,7 +58,6 @@ import org.zoxweb.shared.util.NVGenericMap;
 import org.zoxweb.shared.util.ResourceManager;
 import org.zoxweb.shared.util.SharedBase64.Base64Type;
 import org.zoxweb.shared.util.SharedStringUtil;
-import org.zoxweb.shared.util.SharedUtil;
 
 @SuppressWarnings("serial")
 public abstract class ShiroBaseServlet
@@ -75,7 +74,7 @@ public abstract class ShiroBaseServlet
     protected boolean isSecurityCheckRequired = false;
     protected boolean isAutoLogout = false;
     protected boolean isAppIDInPath = false;
-    protected  Map<HTTPMethod, ContentDataType> httpMethodCodecTypes = new HashMap<HTTPMethod, ContentDataType>();
+    protected  Map<HTTPMethod, ResourceAccessProp> httpResourceAccessProps = new HashMap<HTTPMethod, ResourceAccessProp>();
     
     public void init(ServletConfig config)
             throws ServletException
@@ -87,14 +86,14 @@ public abstract class ShiroBaseServlet
     	log.info("isSecurityCheckRequired:"+isSecurityCheckRequired+",isAutoLogout:"+isAutoLogoutEnabled());
     	
     
-    	Map<Method, ContentDataType> methodDataTypes = ReflectionUtil.extractFromClass(getClass(), ContentDataType.class);
+    	Map<Method, ResourceAccessProp> methodDataTypes = ReflectionUtil.extractFromClass(getClass(), ResourceAccessProp.class);
     	log.info("MethodDataTypes found:" + methodDataTypes.size());
-    	for(Map.Entry<Method,ContentDataType>  e : methodDataTypes.entrySet())
+    	for(Map.Entry<Method,ResourceAccessProp>  e : methodDataTypes.entrySet())
     	{
     		HTTPMethod hm = HTTPMethod.lookup(e.getKey().getName());
     		if (hm != null)
     		{
-    			httpMethodCodecTypes.put(hm, e.getValue());
+    			httpResourceAccessProps.put(hm, e.getValue());
     		}
     	}
     	
@@ -110,6 +109,13 @@ public abstract class ShiroBaseServlet
 
     protected boolean isSecurityCheckRequired(HTTPMethod httpMethod, HttpServletRequest req)
     {
+    	
+    	ResourceAccessProp rap = httpResourceAccessProps.get(httpMethod);
+    	if (rap != null && rap.authRequired())
+    	{
+    		return true;
+    	}
+    		
     	return isSecurityCheckRequired;
     }
 
@@ -157,10 +163,10 @@ public abstract class ShiroBaseServlet
      * @throws ServletException
      * @throws IOException
      */
-    protected boolean passSecurityCheckPoint(HttpServletRequest req, HttpServletResponse res)
+    protected boolean passSecurityCheckPoint(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
         throws ServletException, IOException
     {
-        if (isSecurityCheckRequired((HTTPMethod) SharedUtil.lookupEnum(HTTPMethod.values(), req.getMethod()), req))
+        if (isSecurityCheckRequired(httpMethod, req))
         {
             Subject subject = SecurityUtils.getSubject();
             AuthType reqAuth = AuthType.NONE;
@@ -270,30 +276,36 @@ public abstract class ShiroBaseServlet
 
         try
         {
-            if (passSecurityCheckPoint(req, res))
+        	
+        	HTTPMethod hm = HTTPMethod.lookup(req.getMethod());
+        	if (hm == null)
+        	{
+        		super.service(req, res);
+        		return;
+        	}
+        	
+            if (passSecurityCheckPoint(hm, req, res))
             {
             	try 
             	{
-            		
-            		HTTPMethod hm = HTTPMethod.lookup(req.getMethod());
             		if (hm != null)
             		{
-            			ContentDataType dct = httpMethodCodecTypes.get(hm);
-            			if (dct != null && dct.autoConvert())
+            			ResourceAccessProp dct = httpResourceAccessProps.get(hm);
+            			if (dct != null && dct.dataAutoConvert())
             			{
             				HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
             				if (!SharedStringUtil.isEmpty(hra.getContent()))
             				{
-	            				Class<?> retType = dct.returnType();
+	            				Class<?> retType = dct.dataType();
 	            				try
 	            				{
-		            				if (retType.isAssignableFrom(NVEntity.class))
+		            				if (NVEntity.class.isAssignableFrom(retType))
 		            				{
-		            					hra.setContentObject(GSONUtil.fromJSON(hra.getContent(), (Class<? extends NVEntity>) retType));
+		            					hra.setDataContent(GSONUtil.fromJSON(hra.getContent(), (Class<? extends NVEntity>) retType));
 		            				}
 		            				else if (retType.isAssignableFrom(NVGenericMap.class))
 		            				{
-		            					hra.setContentObject(GSONUtil.fromJSONGenericMap(hra.getContent(), null, Base64Type.DEFAULT));
+		            					hra.setDataContent(GSONUtil.fromJSONGenericMap(hra.getContent(), null, Base64Type.DEFAULT));
 		            				}
 	            				}
 	            				catch(Exception e)
@@ -305,7 +317,7 @@ public abstract class ShiroBaseServlet
             				else
             				{
             					// we have an empty content check if it is allowed
-            					if (dct.returnRequired())
+            					if (dct.dataRequired())
             					{
             						// we have missing content generate error
             						throw new APIException("Content empty", Reason.INCOMPLETE);
@@ -333,16 +345,16 @@ public abstract class ShiroBaseServlet
             			switch(((ExceptionReason) e).getReason())
             			{
 						case ACCESS_DENIED:
-							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.FORBIDDEN, e.getMessage());
+							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.FORBIDDEN, new APIError(e));
 							break;
 						case UNAUTHORIZED:
-							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, e.getMessage());
+							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, new APIError(e));
 							break;
 						case INCOMPLETE:
-							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, e.getMessage());
+							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, new APIError(e));
 							break;
 						case NOT_FOUND:
-							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.NOT_FOUND, e.getMessage());
+							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.NOT_FOUND, new APIError(e));
 							break;
 						
             			}
