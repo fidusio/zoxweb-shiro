@@ -234,11 +234,11 @@ public abstract class ShiroBaseServlet
                 	catch(Exception e)
                 	{
                 		reqAuth = AuthType.BASIC;
-                		log.info(hra.getPathInfo());
                 	}
                 }
                 
-                
+                log.info("ReqAuth:" +reqAuth);
+                log.info(hra.getPathInfo());
                 
                 if (reqAuth == AuthType.NONE)  	
                 {
@@ -265,7 +265,7 @@ public abstract class ShiroBaseServlet
     
    
 	@SuppressWarnings("unchecked")
-	protected boolean authorizationCheckPoint(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
+	protected boolean authorizationCheckPoint(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res) throws IOException
     {
     	
 		ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(httpMethod);
@@ -274,7 +274,15 @@ public abstract class ShiroBaseServlet
 			// check for assigned permission or roles
 			if (srpm.permissions != null)
 			{
-				ShiroUtil.checkPermissions((srpm.permissions.logical() == Logical.OR), SecurityUtils.getSubject(), srpm.permissions.value());
+				try
+				{
+					ShiroUtil.checkPermissions((srpm.permissions.logical() == Logical.OR), SecurityUtils.getSubject(), srpm.permissions.value());
+				}
+				catch(Exception e)
+				{
+					HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, new APIError(e));
+					return true;
+				}
 			}
 		}
     	return true;
@@ -286,7 +294,7 @@ public abstract class ShiroBaseServlet
         {
             Subject subject = SecurityUtils.getSubject();
 
-            if (subject != null)
+            if (subject != null && subject.isAuthenticated())
             {
                 subject.logout();
                 log.info("AutoLogout invoked");  
@@ -356,6 +364,12 @@ public abstract class ShiroBaseServlet
         				
         			}
         			
+        		}
+        		else
+        		{
+        			// check point failed error processed by the check point
+        			// we should return
+        			return;
         		}
         		
         		
