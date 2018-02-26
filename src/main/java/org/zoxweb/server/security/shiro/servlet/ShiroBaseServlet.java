@@ -17,8 +17,7 @@ package org.zoxweb.server.security.shiro.servlet;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -31,10 +30,13 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.http.HTTPRequestAttributes;
 import org.zoxweb.server.http.servlet.HTTPServletUtil;
+import org.zoxweb.server.security.shiro.ShiroResourceProp;
+import org.zoxweb.server.security.shiro.ShiroResourcePropContainer;
+import org.zoxweb.server.security.shiro.ShiroResourcePropScanner;
 import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.server.util.GSONUtil;
-import org.zoxweb.server.util.ReflectionUtil;
+
 import org.zoxweb.shared.annotation.DataProperties;
 import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.api.APIException;
@@ -68,37 +70,40 @@ public abstract class ShiroBaseServlet
     private static final transient Logger log = Logger.getLogger(ShiroBaseServlet.class.getName());
     
     
-    public static final String SECURITY_CHECK = "SECURITY_CHECK";
+    //public static final String SECURITY_CHECK = "SECURITY_CHECK";
     public static final String AUTO_LOGOUT = "AUTO_LOGOUT";
     public static final String APP_ID_IN_PATH = "APP_ID_IN_PATH";
     protected boolean isSecurityCheckRequired = false;
     protected boolean isAutoLogout = false;
     protected boolean isAppIDInPath = false;
-    protected  Map<HTTPMethod, DataProperties> httpResourceAccessProps = new HashMap<HTTPMethod, DataProperties>();
+    //protected  Map<HTTPMethod, DataProperties> httpResourceAccessProps = new HashMap<HTTPMethod, DataProperties>();
+    protected ShiroResourcePropContainer resourceProps = null;
     
     public void init(ServletConfig config)
             throws ServletException
     {
     	super.init(config);
-    	isSecurityCheckRequired = config.getInitParameter(SECURITY_CHECK) != null ? Bool.lookupValue(config.getInitParameter(SECURITY_CHECK)) : false;
+    	
+ 
     	isAutoLogout = config.getInitParameter(AUTO_LOGOUT) != null ? Bool.lookupValue(config.getInitParameter(AUTO_LOGOUT)) : false;
     	isAppIDInPath = config.getInitParameter(APP_ID_IN_PATH) != null ? Bool.lookupValue(config.getInitParameter(APP_ID_IN_PATH)) : false;
     	log.info("isSecurityCheckRequired:"+isSecurityCheckRequired+",isAutoLogout:"+isAutoLogoutEnabled());
     	
-    
-    	Map<Method, DataProperties> methodDataTypes = ReflectionUtil.scanMethodsAnnotation(getClass(), DataProperties.class);
-    	log.info("MethodDataTypes found:" + methodDataTypes.size());
-    	for(Map.Entry<Method,DataProperties>  e : methodDataTypes.entrySet())
+    	resourceProps = ShiroResourcePropScanner.scan(getClass());
+    	
+    	
+    	for(ShiroResourceProp<?> srp : resourceProps.getAllResources())
     	{
-    		HTTPMethod hm = HTTPMethod.lookup(e.getKey().getName());
+    		@SuppressWarnings("unchecked")
+			ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) srp;
+    		
+    		HTTPMethod hm = HTTPMethod.lookup(srpm.resource.getName());
     		if (hm != null)
     		{
-    			httpResourceAccessProps.put(hm, e.getValue());
+    			resourceProps.map(hm, srpm);
     		}
     	}
-    	
-    	
-    	
+    	isSecurityCheckRequired = resourceProps.isAuthcRequired;
     	
     	
     }
@@ -111,9 +116,10 @@ public abstract class ShiroBaseServlet
 
     protected boolean isSecurityCheckRequired(HTTPMethod httpMethod, HttpServletRequest req)
     {
+    	@SuppressWarnings("unchecked")
+		ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(httpMethod);
     	
-    	DataProperties rap = httpResourceAccessProps.get(httpMethod);
-    	if (rap != null && rap.authRequired())
+    	if (srpm != null && srpm.isAuthcRequired)
     	{
     		return true;
     	}
@@ -165,7 +171,7 @@ public abstract class ShiroBaseServlet
      * @throws ServletException
      * @throws IOException
      */
-    protected boolean passSecurityCheckPoint(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
+    protected boolean authenticationCheckPoint(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
         throws ServletException, IOException
     {
         if (isSecurityCheckRequired(httpMethod, req))
@@ -255,6 +261,12 @@ public abstract class ShiroBaseServlet
 
         return true;
     }
+    
+    protected boolean authorizationCheckPoint(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
+    {
+    	
+    	return true;
+    }
 
     protected void postService(HttpServletRequest req, HttpServletResponse res)
     {
@@ -287,13 +299,15 @@ public abstract class ShiroBaseServlet
         		return;
         	}
         	
-            if (passSecurityCheckPoint(hm, req, res))
+            if (authenticationCheckPoint(hm, req, res) && authorizationCheckPoint(hm, req, res))
             {
             	try 
             	{
             		if (hm != null)
             		{
-            			DataProperties dct = httpResourceAccessProps.get(hm);
+            			ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(hm);
+            			
+            			DataProperties dct = srpm !=null ? srpm.dataProperties : null;
             			if (dct != null && dct.dataAutoConvert())
             			{
             				HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
