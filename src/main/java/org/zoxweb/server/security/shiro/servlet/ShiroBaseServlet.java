@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.http.HTTPRequestAttributes;
 import org.zoxweb.server.http.servlet.HTTPServletUtil;
@@ -262,9 +263,20 @@ public abstract class ShiroBaseServlet
         return true;
     }
     
-    protected boolean authorizationCheckPoint(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
+   
+	@SuppressWarnings("unchecked")
+	protected boolean authorizationCheckPoint(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
     {
     	
+		ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(httpMethod);
+		if (srpm != null)
+		{
+			// check for assigned permission or roles
+			if (srpm.permissions != null)
+			{
+				ShiroUtil.checkPermissions((srpm.permissions.logical() == Logical.OR), SecurityUtils.getSubject(), srpm.permissions.value());
+			}
+		}
     	return true;
     }
 
@@ -298,99 +310,97 @@ public abstract class ShiroBaseServlet
         		super.service(req, res);
         		return;
         	}
-        	
-            if (authenticationCheckPoint(hm, req, res) && authorizationCheckPoint(hm, req, res))
-            {
-            	try 
-            	{
-            		if (hm != null)
-            		{
-            			ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(hm);
-            			
-            			DataProperties dct = srpm !=null ? srpm.dataProperties : null;
-            			if (dct != null && dct.dataAutoConvert())
-            			{
-            				HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
-            				if (!SharedStringUtil.isEmpty(hra.getContent()))
+        	// Note always call authentication checkpoint first
+        	// then authorizationCheckPoint check point
+        	// because subject must be authenticated before getting autorization
+            
+        	try 
+        	{
+        		if (authenticationCheckPoint(hm, req, res) && authorizationCheckPoint(hm, req, res))
+        		{
+        			ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(hm);
+        			// check if we need to autoconvert data object
+        			DataProperties dct = srpm !=null ? srpm.dataProperties : null;
+        			if (dct != null && dct.dataAutoConvert())
+        			{
+        				HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
+        				if (!SharedStringUtil.isEmpty(hra.getContent()))
+        				{
+            				Class<?> retType = dct.dataType();
+            				try
             				{
-	            				Class<?> retType = dct.dataType();
-	            				try
+	            				if (NVEntity.class.isAssignableFrom(retType))
 	            				{
-		            				if (NVEntity.class.isAssignableFrom(retType))
-		            				{
-		            					hra.setDataContent(GSONUtil.fromJSON(hra.getContent(), (Class<? extends NVEntity>) retType));
-		            				}
-		            				else if (retType.isAssignableFrom(NVGenericMap.class))
-		            				{
-		            					hra.setDataContent(GSONUtil.fromJSONGenericMap(hra.getContent(), null, Base64Type.DEFAULT));
-		            				}
+	            					hra.setDataContent(GSONUtil.fromJSON(hra.getContent(), (Class<? extends NVEntity>) retType));
 	            				}
-	            				catch(Exception e)
+	            				else if (retType.isAssignableFrom(NVGenericMap.class))
 	            				{
-	            					e.printStackTrace();
-	            					throw new APIException("Content not matching", Reason.INCOMPLETE);
+	            					hra.setDataContent(GSONUtil.fromJSONGenericMap(hra.getContent(), null, Base64Type.DEFAULT));
 	            				}
             				}
-            				else
+            				catch(Exception e)
             				{
-            					// we have an empty content check if it is allowed
-            					if (dct.dataRequired())
-            					{
-            						// we have missing content generate error
-            						throw new APIException("Content empty", Reason.INCOMPLETE);
-            					}
+            					e.printStackTrace();
+            					throw new APIException("Content not matching", Reason.INCOMPLETE);
             				}
-            				
-            			}
-            			
-            		}
-            		
-            		
-            		switch (req.getMethod().toUpperCase())
-            		{
-                    	case "PATCH":
-                    		doPatch(req, res);
-                    		break;
-                    	default:
-                    		super.service(req, res);
-            		}
-            	}
-            	catch(AccessException | APIException | NullPointerException | IllegalArgumentException e)
-            	{
-            		if (e instanceof ExceptionReason)
-            		{
-            			switch(((ExceptionReason) e).getReason())
-            			{
-						case ACCESS_DENIED:
-							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.FORBIDDEN, new APIError(e));
-							break;
-						case UNAUTHORIZED:
-							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, new APIError(e));
-							break;
-						case INCOMPLETE:
-							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, new APIError(e));
-							break;
-						case NOT_FOUND:
-							HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.NOT_FOUND, new APIError(e));
-							break;
-						
-            			}
-            		}
-            		else if(e instanceof IllegalArgumentException)
-            		{
-            			HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, e.getMessage());
-            		}
-            		else if(e instanceof NullPointerException)
-            		{
-            			HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.INTERNAL_SERVER_ERROR, e.getMessage());
-            		}
-            	}
-
-                postService(req, res);
-            }
+        				}
+        				else
+        				{
+        					// we have an empty content check if it is allowed
+        					if (dct.dataRequired())
+        					{
+        						// we have missing content generate error
+        						throw new APIException("Content empty", Reason.INCOMPLETE);
+        					}
+        				}
+        				
+        			}
+        			
+        		}
+        		
+        		
+        		switch (req.getMethod().toUpperCase())
+        		{
+                	case "PATCH":
+                		doPatch(req, res);
+                		break;
+                	default:
+                		super.service(req, res);
+        		}
+        	}
+        	catch(AccessException | APIException | NullPointerException | IllegalArgumentException e)
+        	{
+        		if (e instanceof ExceptionReason)
+        		{
+        			switch(((ExceptionReason) e).getReason())
+        			{
+					case ACCESS_DENIED:
+						HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.FORBIDDEN, new APIError(e));
+						break;
+					case UNAUTHORIZED:
+						HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, new APIError(e));
+						break;
+					case INCOMPLETE:
+						HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, new APIError(e));
+						break;
+					case NOT_FOUND:
+						HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.NOT_FOUND, new APIError(e));
+						break;
+        			}
+        		}
+        		else if(e instanceof IllegalArgumentException)
+        		{
+        			HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, e.getMessage());
+        		}
+        		else if(e instanceof NullPointerException)
+        		{
+        			HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.INTERNAL_SERVER_ERROR, e.getMessage());
+        		}
+        	}
         }
         finally
         {
+        	postService(req, res);
             delta = System.nanoTime() - delta;
             log.info(getServletName() + ":" + req.getMethod() + ":PT:" + Const.TimeInMillis.nanosToString(delta));
         }
