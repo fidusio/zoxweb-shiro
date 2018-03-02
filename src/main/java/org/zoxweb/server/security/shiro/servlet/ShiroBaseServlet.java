@@ -269,10 +269,11 @@ public abstract class ShiroBaseServlet
     {
     	
 		ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(httpMethod);
+		
 		if (srpm != null)
 		{
 			// check for assigned permission or roles
-			if (srpm.permissions != null)
+			if (srpm.permissions != null && (srpm.permissionProp == null || srpm.permissionProp.implicitValidation()))
 			{
 				try
 				{

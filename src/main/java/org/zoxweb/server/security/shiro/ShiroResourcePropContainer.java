@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.zoxweb.server.security.shiro.authz.PermissionsProp;
 
 public class ShiroResourcePropContainer
 	extends ShiroResourceProp<Class<?>>
@@ -13,9 +14,9 @@ public class ShiroResourcePropContainer
 	private Map<Object, ShiroResourceProp<?>> mapByResource = new HashMap<Object, ShiroResourceProp<?>>();
 	private Map<Object, ShiroResourceProp<?>> mapByResourceMap = new HashMap<Object, ShiroResourceProp<?>>();
 	
-	public ShiroResourcePropContainer(Class<?> resource, boolean authc, RequiresRoles roles, RequiresPermissions permissions)
+	public ShiroResourcePropContainer(Class<?> resource, boolean authc, RequiresRoles roles, RequiresPermissions permissions, PermissionsProp permissionProp)
 	{
-		super(resource, authc, roles, permissions, null);
+		super(resource, authc, roles, permissions, permissionProp,  null);
 		// TODO Auto-generated constructor stub
 	}
 	
