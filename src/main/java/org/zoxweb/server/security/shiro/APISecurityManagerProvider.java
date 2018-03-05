@@ -23,6 +23,7 @@ import org.zoxweb.server.security.KeyMakerProvider;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APICredentialsDAO;
 import org.zoxweb.shared.api.APIDataStore;
+
 import org.zoxweb.shared.api.APISecurityManager;
 import org.zoxweb.shared.api.APITokenDAO;
 import org.zoxweb.shared.crypto.EncryptedDAO;
@@ -911,6 +912,9 @@ public class APISecurityManagerProvider
 		// TODO Auto-generated method stub
 		return SecurityUtils.getSubject().hasRole(role);
 	}
+
+
+
 	
 	
 }

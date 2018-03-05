@@ -7,7 +7,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
+/**
+ * The permission properties are extra parameters that will allow an aop system to validate permissions
+ * @author javaconsigliere
+ *
+ */
 
 
 @Documented
@@ -15,6 +19,9 @@ import java.lang.annotation.Target;
 @Target({ METHOD, TYPE_PARAMETER })
 public @interface PermissionsProp 
 {
-	// if true the permission validation is done automatically by the aop
-	boolean implicitValidation() default true;
+	/**
+	 * If true the permission validation is done automatically by the aop
+	 * @return
+	 */
+	boolean autoValidation() default true;
 }

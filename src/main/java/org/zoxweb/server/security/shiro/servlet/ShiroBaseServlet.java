@@ -110,11 +110,13 @@ public abstract class ShiroBaseServlet
     }
     
     
-//    public ShiroBaseServlet()
-//    {
-//        super();
-//    }
 
+    /**
+     * This method is kept to backward compatibility
+     * @param httpMethod
+     * @param req
+     * @return
+     */
     protected boolean isSecurityCheckRequired(HTTPMethod httpMethod, HttpServletRequest req)
     {
     	@SuppressWarnings("unchecked")
@@ -152,12 +154,16 @@ public abstract class ShiroBaseServlet
         }
     }
 
+    /**
+     * If true the subject will be logged out and session invalidated
+     * @return
+     */
     protected boolean isAutoLogoutEnabled()
     {
         return isAutoLogout;
     }
     
-    protected boolean isAppIDInPath(HttpServletRequest req)
+    protected boolean isAppIDPathRequired(HttpServletRequest req)
     {
     	return isAppIDInPath;
     }
@@ -218,7 +224,9 @@ public abstract class ShiroBaseServlet
                 			
                 			
                 			AppIDURI appIDURI = hra.getAppIDURI();
-                			if(isAppIDInPath(req) && appIDURI == null)
+                			
+                			// check in the app id is required and in present in the uri
+                			if(isAppIDPathRequired(req) && appIDURI == null)
                 			{
                 				return false;
                 			}
@@ -273,7 +281,7 @@ public abstract class ShiroBaseServlet
 		if (srpm != null)
 		{
 			// check for assigned permission or roles
-			if (srpm.permissions != null && (srpm.permissionProp == null || srpm.permissionProp.implicitValidation()))
+			if (srpm.permissions != null && (srpm.permissionProp == null || srpm.permissionProp.autoValidation()))
 			{
 				try
 				{
@@ -288,6 +296,48 @@ public abstract class ShiroBaseServlet
 		}
     	return true;
     }
+	
+	@SuppressWarnings("unchecked")
+	protected void dataDecoding(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
+	{
+		ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(httpMethod);
+		// check if we need to autoconvert data object
+		DataProperties dct = srpm !=null ? srpm.dataProperties : null;
+		if (dct != null && dct.dataAutoConvert())
+		{
+			HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
+			if (!SharedStringUtil.isEmpty(hra.getContent()))
+			{
+				Class<?> retType = dct.dataType();
+				try
+				{
+    				if (NVEntity.class.isAssignableFrom(retType))
+    				{
+    					hra.setDataContent(GSONUtil.fromJSON(hra.getContent(), (Class<? extends NVEntity>) retType));
+    				}
+    				else if (retType.isAssignableFrom(NVGenericMap.class))
+    				{
+    					hra.setDataContent(GSONUtil.fromJSONGenericMap(hra.getContent(), null, Base64Type.DEFAULT));
+    				}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new APIException("Content not matching", Reason.INCOMPLETE);
+				}
+			}
+			else
+			{
+				// we have an empty content check if it is allowed
+				if (dct.dataRequired())
+				{
+					// we have missing content generate error
+					throw new APIException("Content empty", Reason.INCOMPLETE);
+				}
+			}
+			
+		}
+	}
 
     protected void postService(HttpServletRequest req, HttpServletResponse res)
     {
@@ -302,8 +352,7 @@ public abstract class ShiroBaseServlet
             }
         }
     }
-
-    @SuppressWarnings("unchecked")
+    
 	@Override
     protected void service(HttpServletRequest req, HttpServletResponse res)
         throws ServletException, IOException
@@ -321,57 +370,21 @@ public abstract class ShiroBaseServlet
         	}
         	// Note always call authentication checkpoint first
         	// then authorizationCheckPoint check point
-        	// because subject must be authenticated before getting autorization
+        	// because subject must be authenticated before getting authorized
             
         	try 
         	{
-        		if (authenticationCheckPoint(hm, req, res) && authorizationCheckPoint(hm, req, res))
-        		{
-        			ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(hm);
-        			// check if we need to autoconvert data object
-        			DataProperties dct = srpm !=null ? srpm.dataProperties : null;
-        			if (dct != null && dct.dataAutoConvert())
-        			{
-        				HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
-        				if (!SharedStringUtil.isEmpty(hra.getContent()))
-        				{
-            				Class<?> retType = dct.dataType();
-            				try
-            				{
-	            				if (NVEntity.class.isAssignableFrom(retType))
-	            				{
-	            					hra.setDataContent(GSONUtil.fromJSON(hra.getContent(), (Class<? extends NVEntity>) retType));
-	            				}
-	            				else if (retType.isAssignableFrom(NVGenericMap.class))
-	            				{
-	            					hra.setDataContent(GSONUtil.fromJSONGenericMap(hra.getContent(), null, Base64Type.DEFAULT));
-	            				}
-            				}
-            				catch(Exception e)
-            				{
-            					e.printStackTrace();
-            					throw new APIException("Content not matching", Reason.INCOMPLETE);
-            				}
-        				}
-        				else
-        				{
-        					// we have an empty content check if it is allowed
-        					if (dct.dataRequired())
-        					{
-        						// we have missing content generate error
-        						throw new APIException("Content empty", Reason.INCOMPLETE);
-        					}
-        				}
-        				
-        			}
-        			
-        		}
-        		else
+        		if (!(authenticationCheckPoint(hm, req, res) &&
+        			  authorizationCheckPoint(hm, req, res)))
         		{
         			// check point failed error processed by the check point
         			// we should return
         			return;
         		}
+        		
+        		
+        		// data decoding if required
+        		dataDecoding(hm, req, res);
         		
         		
         		switch (req.getMethod().toUpperCase())
