@@ -33,18 +33,22 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.api.APIAppManagerProvider;
+import org.zoxweb.server.io.IOUtil;
 import org.zoxweb.server.security.shiro.authc.DomainAuthenticationInfo;
 import org.zoxweb.server.security.shiro.authc.DomainPrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
+import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
+import org.zoxweb.shared.api.APIAppManager;
 import org.zoxweb.shared.api.APIDataStore;
 import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.api.APISecurityManager;
 import org.zoxweb.shared.crypto.PasswordDAO;
+import org.zoxweb.shared.data.AppDeviceDAO;
 import org.zoxweb.shared.data.AppIDDAO;
 import org.zoxweb.shared.data.UserIDDAO;
 import org.zoxweb.shared.db.QueryMatchString;
 import org.zoxweb.shared.security.AccessException;
-
+import org.zoxweb.shared.security.SubjectAPIKey;
 import org.zoxweb.shared.security.shiro.ShiroAssociationDAO;
 import org.zoxweb.shared.security.shiro.ShiroAssociationType;
 import org.zoxweb.shared.security.shiro.ShiroCollectionAssociationDAO;
@@ -119,35 +123,121 @@ public abstract class ShiroBaseRealm
 	 * @see org.apache.shiro.realm.AuthenticatingRealm#doGetAuthenticationInfo(org.apache.shiro.authc.AuthenticationToken)
 	 */
 	@Override
+//	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
+//        throws AuthenticationException
+//    {
+//		
+//		if (token instanceof DomainUsernamePasswordToken)
+//		{
+//			log.info( "Domain based authentication");
+//			DomainUsernamePasswordToken upToken = (DomainUsernamePasswordToken) token;
+//	        String userName = upToken.getUsername();
+//	        String domainID = upToken.getDomainID();
+//	        String applicationID = upToken.getAppID();
+//	        String userID = upToken.getUserID();
+//	        log.info( domainID +":"+userName);
+//	        // Null username is invalid
+//	        if (userName == null)
+//	        {
+//	            throw new AccountException("Null usernames are not allowed by this realm.");
+//	        }
+//
+//	        PasswordDAO password = getUserPassword(domainID, userName);
+//
+//	         if (password == null)
+//	         {
+//	        	throw new UnknownAccountException("No account found for user [" + userID + "]");
+//	        }
+//
+//	        return new DomainAuthenticationInfo(userName, userID, password, getName(), domainID, applicationID, null);
+//	    }	
+//		 throw new AuthenticationException("Not a domain info");
+//	}
+	
+	
+	
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
-        throws AuthenticationException
-    {
+			throws AuthenticationException
+	{
+		log.info("AuthenticationToken:" + token);
 		
 		if (token instanceof DomainUsernamePasswordToken)
 		{
-			log.info( "Domain based authentication");
+			log.info("DomainUsernamePasswordToken based authentication");
 			DomainUsernamePasswordToken upToken = (DomainUsernamePasswordToken) token;
-	        String userName = upToken.getUsername();
-	        String domainID = upToken.getDomainID();
-	        String applicationID = upToken.getAppID();
-	        String userID = upToken.getUserID();
-	        log.info( domainID +":"+userName);
-	        // Null username is invalid
-	        if (userName == null)
+	        //String userName = upToken.getUsername();
+	        //String domainID = upToken.getDomainID();
+	        if (upToken.getUsername() == null)
 	        {
 	            throw new AccountException("Null usernames are not allowed by this realm.");
 	        }
-
-	        PasswordDAO password = getUserPassword(domainID, userName);
-
-	         if (password == null)
-	         {
-	        	throw new UnknownAccountException("No account found for user [" + userID + "]");
+	        UserIDDAO userIDDAO = lookupUserID(upToken.getUsername(), "_id", "_user_id");
+	        if (userIDDAO == null)
+	        {
+	            throw new AccountException("Account not found usernames are not allowed by this realm.");
+	        }
+	        upToken.setUserID(userIDDAO.getUserID());
+	        // String userID = upToken.getUserID();
+	        log.info( upToken.getUsername() +":"+upToken.getUserID());
+	        // Null username is invalid
+	        
+	        PasswordDAO password = getUserPassword(null, upToken.getUsername());
+	        if (password == null)
+	        {
+	        	throw new UnknownAccountException("No account found for user [" + upToken.getUserID() + "]");
 	        }
 
-	        return new DomainAuthenticationInfo(userName, userID, password, getName(), domainID, applicationID, null);
-	    }	
-		 throw new AuthenticationException("Not a domain info");
+	        return new DomainAuthenticationInfo(upToken.getUsername(), upToken.getUserID(), password, getName(), upToken.getDomainID(), upToken.getAppID(), null);
+	    }
+		else if (token instanceof JWTAuthenticationToken)
+		{
+			log.info("JWTAuthenticationToken based authentication");
+			// lookup AppDeviceDAO or SubjectAPIKey
+			// in oder to do that we need to switch the user to SUPER_ADMIN or DAEMON user
+			JWTAuthenticationToken jwtAuthToken = (JWTAuthenticationToken) token;
+			SubjectSwap ss = null;
+			try
+			{
+				APISecurityManager<Subject> sm = ResourceManager.SINGLETON.lookup(Resource.API_SECURITY_MANAGER);
+				APIAppManager appManager =  ResourceManager.SINGLETON.lookup(Resource.API_APP_MANAGER);
+				
+				ss = new SubjectSwap(sm.getDaemonSubject());
+				SubjectAPIKey sak = appManager.lookupSubjectAPIKey(jwtAuthToken.getJWTSubjectID(), false);
+				if (sak == null)
+					throw new UnknownAccountException("No account found for user [" + jwtAuthToken.getJWTSubjectID() + "]");
+				UserIDDAO userIDDAO = lookupUserID(sak.getUserID(), "_id", "_user_id", "primary_email");
+			    if (userIDDAO == null)
+			    {
+			        throw new AccountException("Account not found usernames are not allowed by this realm.");
+			    }
+			    
+			    // set the actual user 
+			    jwtAuthToken.setSubjectID(userIDDAO.getSubjectID());
+			    
+			    String domainID = jwtAuthToken.getDomainID();
+			    String appID    = jwtAuthToken.getAppID();
+			    if (sak instanceof AppDeviceDAO)
+			    {
+			    	domainID = ((AppDeviceDAO) sak).getDomainID();
+				    appID    = ((AppDeviceDAO) sak).getAppID();
+			    }
+			    
+			    DomainAuthenticationInfo ret =  new DomainAuthenticationInfo(jwtAuthToken.getSubjectID(), sak.getUserID(), sak.getAPISecretAsBytes(), getName(), domainID, appID, jwtAuthToken.getJWTSubjectID());
+			    
+			    return ret;
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			finally
+			{
+				IOUtil.close(ss);
+			}
+			
+			
+		}
+		 throw new AuthenticationException("Invalid Authentication Token");
 	}
 	
 	protected abstract PasswordDAO getUserPassword(String domainID, String userID);

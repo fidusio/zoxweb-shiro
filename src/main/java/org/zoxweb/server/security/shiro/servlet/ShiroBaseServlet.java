@@ -228,7 +228,8 @@ public abstract class ShiroBaseServlet
                 			// check in the app id is required and in present in the uri
                 			if(isAppIDPathRequired(req) && appIDURI == null)
                 			{
-                				return false;
+                				
+                				throw new APIException();
                 			}
                 			
                 			
@@ -290,7 +291,7 @@ public abstract class ShiroBaseServlet
 				catch(Exception e)
 				{
 					HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, new APIError(e));
-					return true;
+					return false;
 				}
 			}
 		}
