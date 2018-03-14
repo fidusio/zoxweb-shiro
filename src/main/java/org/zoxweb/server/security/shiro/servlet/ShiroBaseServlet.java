@@ -205,8 +205,11 @@ public abstract class ShiroBaseServlet
                 		subject = SecurityUtils.getSubject();
                 		subject.login(authToken);
                 		log.info("Implicit login activated");
-                		log.info("JWT ID:" + jwtToken.getJWT().getPayload().getJWTID());
-                		log.info("Server timestamp:" + System.currentTimeMillis());
+                		long ts = System.currentTimeMillis();
+                		if (jwtToken.getJWT().getPayload().getIssuedAt() != 0)
+                		{
+                			log.info("JWT IAT:" + jwtToken.getJWT().getPayload().getIssuedAt() + " time difference between s/c " + (ts - jwtToken.getJWT().getPayload().getIssuedAt() ));
+                		}
                 		return true;
                 	}
                 	catch(Exception e)
