@@ -56,7 +56,7 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 			}
 			else if (info.getCredentials() instanceof byte[] && token instanceof JWTAuthenticationToken)
 			{
-				JWT jwt = JWTProvider.SINGLETON.decodeJWT((byte[]) info.getCredentials(), (String)token.getCredentials());
+				JWT jwt = JWTProvider.SINGLETON.decode((byte[]) info.getCredentials(), (String)token.getCredentials());
 				if (info instanceof DomainAuthenticationInfo)
 				{
 					DomainAuthenticationInfo dai = (DomainAuthenticationInfo) info;
