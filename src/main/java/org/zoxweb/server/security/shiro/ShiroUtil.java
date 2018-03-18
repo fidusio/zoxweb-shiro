@@ -132,7 +132,7 @@ public class ShiroUtil
 	{
 		try
         {
-			Subject subject = SecurityUtils.getSubject();
+			Subject subject = subject();
 			
 			if (subject.isAuthenticated())
 			{
@@ -156,7 +156,7 @@ public class ShiroUtil
     {
 	    try
         {
-			Subject subject = SecurityUtils.getSubject();
+			Subject subject = subject();
 			
 			if (subject.isAuthenticated())
 			{
@@ -232,7 +232,7 @@ public class ShiroUtil
 
 		try
         {
-			Subject subject = SecurityUtils.getSubject();
+			Subject subject = subject();
 			
 			if (subject.isAuthenticated())
 			{
@@ -255,9 +255,7 @@ public class ShiroUtil
     {
 		try
         {
-			Subject subject = SecurityUtils.getSubject();
-			subject.getSession().getId().toString();
-			
+			Subject subject = subject();
 			if (subject.isAuthenticated())
 			{
 				return subject.getSession().getId().toString();
@@ -270,13 +268,27 @@ public class ShiroUtil
 			throw new AccessException(e.getMessage());
 		}
 	}
+	
+	public static Subject subject()
+			throws AccessException
+	{
+		try
+        {
+			return SecurityUtils.getSubject();
+			
+		}
+		catch (ShiroException e)
+        {
+			throw new AccessException(e.getMessage());
+		}
+	}
 
 	public static String subjectAppID()
 		throws AccessException
     {
 	    try
         {
-			Subject subject = SecurityUtils.getSubject();
+			Subject subject = subject();
 			
 			if (subject.isAuthenticated())
 			{
@@ -443,7 +455,7 @@ public class ShiroUtil
 	public static boolean isPermitted(String permission) 
         throws NullPointerException, AccessException
     {
-		return isPermitted(SecurityUtils.getSubject(), permission);
+		return isPermitted(subject(), permission);
 	}
 
 	public static ShiroNVEntityCRUDs assignCRUDs(NVEntity nve, CRUD... cruds)
@@ -517,7 +529,7 @@ public class ShiroUtil
 	 */
 	public static Subject getSubject(SecurityManager securityManager)
     {
-		// need to check with session context if the actual used it found 
+		// need to check with session context if the actual subject is found 
         Subject subject = ThreadContext.getSubject();
 
         if (subject == null)
