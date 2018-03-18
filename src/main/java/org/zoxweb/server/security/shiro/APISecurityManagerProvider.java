@@ -1,5 +1,6 @@
 package org.zoxweb.server.security.shiro;
 
+
 import java.util.List;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -491,8 +492,8 @@ public class APISecurityManagerProvider
 				boolean checkStatus = false;
 				for(CRUD permission : permissions)
 				{
-					checkStatus = ShiroUtil.isPermitted(SharedUtil.toCanonicalID(':', "nventity", permission, nve.getReferenceID()));
-				
+					String pattern = SharedUtil.toCanonicalID(':', "nventity", permission, nve.getReferenceID());
+					checkStatus = ShiroUtil.isPermitted(pattern);
 					if ((checkStatus && LogicalOperator.OR == lo) ||
 						(!checkStatus && LogicalOperator.AND == lo))
 					{

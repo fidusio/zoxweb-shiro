@@ -460,6 +460,8 @@ public abstract class ShiroBaseRealm
 	
 	
 	
+	public abstract Set<String> getRecusiveNVEReferenceIDFromForm(String formReferenceID);
+	
 	
 	public void clearUserCache(String userSubjectID)
 	{
