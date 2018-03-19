@@ -63,6 +63,7 @@ import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.GetValue;
 import org.zoxweb.shared.util.Const.RelationalOperator;
 import org.zoxweb.shared.util.ResourceManager.Resource;
+import org.zoxweb.shared.util.SharedStringUtil;
 import org.zoxweb.shared.util.MetaToken;
 import org.zoxweb.shared.util.ResourceManager;
 import org.zoxweb.shared.util.SharedUtil;
@@ -432,22 +433,26 @@ public abstract class ShiroBaseRealm
 	public abstract Set<String> getRecusiveNVEReferenceIDFromForm(String formReferenceID);
 	
 	
-	public void clearUserCache(String userSubjectID)
-	{
-		if (userSubjectID != null)
-		{
-			UserIDDAO userID = lookupUserID(userSubjectID);
-			if (userID != null)
-			{
-				log.info("we must clear the autorizationinfo of " + userID.getPrimaryEmail());
-				clearCachedAuthorizationInfo(new SimplePrincipalCollection(userID.getPrimaryEmail(), getName()));
-			}
-		}
-	}
+//	protected void clearUserCache(String userSubjectID)
+//	{
+//		if (userSubjectID != null)
+//		{
+//			UserIDDAO userID = lookupUserID(userSubjectID);
+//			if (userID != null)
+//			{
+//				log.info("we must clear the autorizationinfo of " + userID.getPrimaryEmail());
+//				SimplePrincipalCollection principals = new SimplePrincipalCollection(userID.getPrimaryEmail(), getName());
+//				clearCachedAuthenticationInfo(principals);
+//				clearCachedAuthorizationInfo(principals);
+//			}
+//		}
+//	}
 	
 	 protected void doClearCache(PrincipalCollection principals) 
 	 {	
+		 
 		 log.info("principal to clear:" + principals);
+		
 		 if(!isAuthenticationCachingEnabled())
 		 { 
 			 log.info("isAuthenticationCachingEnabled is no enabled for:" + principals);
@@ -459,4 +464,65 @@ public abstract class ShiroBaseRealm
 			 log.info("isAuthorizationCachingEnabled is no enabled for:" + principals);
 		 }
 	 }
+	 
+	 
+	 public void invalidate(String resourceID)
+	 {
+		 if (!SharedStringUtil.isEmpty(resourceID))
+		 {
+			 // check it is a subject key id
+			 
+			SubjectSwap ss = null;
+			SimplePrincipalCollection principalCollection = null;
+			try
+			{
+				log.info("ResourceID:" + resourceID);
+				APISecurityManager<Subject> sm = ResourceManager.SINGLETON.lookup(Resource.API_SECURITY_MANAGER);
+				APIAppManager appManager =  ResourceManager.SINGLETON.lookup(Resource.API_APP_MANAGER);
+				// try subject api key first
+				if (sm != null && appManager != null)
+				{
+					ss = new SubjectSwap(sm.getDaemonSubject());
+					SubjectAPIKey sak = appManager.lookupSubjectAPIKey(resourceID, false);
+					if (sak != null)
+					{
+						UserIDDAO userIDDAO = lookupUserID(sak.getUserID(), "_id", "_user_id", "primary_email");
+						if (userIDDAO != null)
+						{
+							log.info("We have a subject api key:" + sak.getSubjectID());
+							principalCollection = new DomainPrincipalCollection(userIDDAO.getSubjectID(), null, getName(), null, null, sak.getSubjectID());
+						}
+					}
+				}
+				
+				// try user
+				if (principalCollection == null)
+				{
+					UserIDDAO userIDDAO = lookupUserID(resourceID, "_id", "_user_id", "primary_email");
+					if (userIDDAO != null)
+					{
+						log.info("We have a user:" + userIDDAO.getSubjectID());
+						principalCollection = new DomainPrincipalCollection(userIDDAO.getSubjectID(), null, getName(), null, null, null);
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			finally
+			{
+				IOUtil.close(ss);
+			}
+			 
+			if (principalCollection != null)
+			{
+				log.info("clearing cached data for:" + principalCollection);
+				clearCachedAuthenticationInfo(principalCollection);
+				clearCachedAuthorizationInfo(principalCollection);
+			}
+			 // or user id
+		 }
+	 }
+	 
 }

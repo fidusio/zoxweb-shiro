@@ -51,18 +51,18 @@ public class DomainPrincipalCollection
 		{
 			add(token_subject_id, realmName);
 		}
-		if (domain_id != null)
-		{
-			add(domain_id, realmName);
-		}
-		if (application_id != null)
-		{
-			add(application_id, realmName);
-		}
-		if(user_id != null)
-		{
-			add(user_id, realmName);
-		}
+//		if (domain_id != null)
+//		{
+//			add(domain_id, realmName);
+//		}
+//		if (application_id != null)
+//		{
+//			add(application_id, realmName);
+//		}
+//		if(user_id != null)
+//		{
+//			add(user_id, realmName);
+//		}
 		
 		
 		

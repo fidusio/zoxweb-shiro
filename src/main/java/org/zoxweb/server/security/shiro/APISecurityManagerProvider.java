@@ -915,6 +915,14 @@ public class APISecurityManagerProvider
 	}
 
 
+	@Override
+	public void invalidateResource(String resourceID)
+	{
+		getShiroBaseRealm().invalidate(resourceID);
+		
+	}
+
+
 
 	
 	
