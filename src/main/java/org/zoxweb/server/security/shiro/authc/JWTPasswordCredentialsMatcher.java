@@ -34,6 +34,8 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 				{
 					return true;
 				}
+				
+				//log.info("SimpleAuthentication token:" + token.getClass().getName());
 			
 	
 				PasswordDAO passwordDAO = (PasswordDAO) info.getCredentials();
@@ -56,6 +58,7 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 			}
 			else if (info.getCredentials() instanceof byte[] && token instanceof JWTAuthenticationToken)
 			{
+				//log.info("JWTAuthenticationToken");
 				JWT jwt = JWTProvider.SINGLETON.decode((byte[]) info.getCredentials(), (String)token.getCredentials());
 				if (info instanceof DomainAuthenticationInfo)
 				{

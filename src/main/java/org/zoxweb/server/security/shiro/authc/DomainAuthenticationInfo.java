@@ -25,7 +25,8 @@ public class DomainAuthenticationInfo
 	public DomainAuthenticationInfo(Object principal, String userID, Object credentials, String realmName, String domainID, String applicationID, String jwtSubjectID)
     {
 		 this.principals = new DomainPrincipalCollection(principal, userID, realmName, domainID, applicationID, jwtSubjectID);
-	     this.credentials = credentials;   
+		 
+	     this.credentials = credentials;
 	}
 	
 //	 public DomainAuthenticationInfo(Object principal, Object credentials, String realmName, String domainID) 

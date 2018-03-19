@@ -123,75 +123,44 @@ public abstract class ShiroBaseRealm
 	 * @see org.apache.shiro.realm.AuthenticatingRealm#doGetAuthenticationInfo(org.apache.shiro.authc.AuthenticationToken)
 	 */
 	@Override
-//	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
-//        throws AuthenticationException
-//    {
-//		
-//		if (token instanceof DomainUsernamePasswordToken)
-//		{
-//			log.info( "Domain based authentication");
-//			DomainUsernamePasswordToken upToken = (DomainUsernamePasswordToken) token;
-//	        String userName = upToken.getUsername();
-//	        String domainID = upToken.getDomainID();
-//	        String applicationID = upToken.getAppID();
-//	        String userID = upToken.getUserID();
-//	        log.info( domainID +":"+userName);
-//	        // Null username is invalid
-//	        if (userName == null)
-//	        {
-//	            throw new AccountException("Null usernames are not allowed by this realm.");
-//	        }
-//
-//	        PasswordDAO password = getUserPassword(domainID, userName);
-//
-//	         if (password == null)
-//	         {
-//	        	throw new UnknownAccountException("No account found for user [" + userID + "]");
-//	        }
-//
-//	        return new DomainAuthenticationInfo(userName, userID, password, getName(), domainID, applicationID, null);
-//	    }	
-//		 throw new AuthenticationException("Not a domain info");
-//	}
-	
-	
-	
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
 			throws AuthenticationException
 	{
-		log.info("AuthenticationToken:" + token);
+		//log.info("AuthenticationToken:" + token);
 		
 		if (token instanceof DomainUsernamePasswordToken)
 		{
-			log.info("DomainUsernamePasswordToken based authentication");
-			DomainUsernamePasswordToken upToken = (DomainUsernamePasswordToken) token;
+			//log.info("DomainUsernamePasswordToken based authentication");
+			DomainUsernamePasswordToken dupToken = (DomainUsernamePasswordToken) token;
 	        //String userName = upToken.getUsername();
 	        //String domainID = upToken.getDomainID();
-	        if (upToken.getUsername() == null)
+	        if (dupToken.getUsername() == null)
 	        {
 	            throw new AccountException("Null usernames are not allowed by this realm.");
 	        }
-	        UserIDDAO userIDDAO = lookupUserID(upToken.getUsername(), "_id", "_user_id");
+	        UserIDDAO userIDDAO = lookupUserID(dupToken.getUsername(), "_id", "_user_id");
 	        if (userIDDAO == null)
 	        {
 	            throw new AccountException("Account not found usernames are not allowed by this realm.");
 	        }
-	        upToken.setUserID(userIDDAO.getUserID());
+	        dupToken.setUserID(userIDDAO.getUserID());
 	        // String userID = upToken.getUserID();
-	        log.info( upToken.getUsername() +":"+upToken.getUserID());
+	        //log.info( dupToken.getUsername() +":"+dupToken.getUserID());
 	        // Null username is invalid
 	        
-	        PasswordDAO password = getUserPassword(null, upToken.getUsername());
+	        PasswordDAO password = getUserPassword(null, dupToken.getUsername());
 	        if (password == null)
 	        {
-	        	throw new UnknownAccountException("No account found for user [" + upToken.getUserID() + "]");
+	        	throw new UnknownAccountException("No account found for user [" + dupToken.getUserID() + "]");
 	        }
+	        
+	        String realm = getName();
 
-	        return new DomainAuthenticationInfo(upToken.getUsername(), upToken.getUserID(), password, getName(), upToken.getDomainID(), upToken.getAppID(), null);
+	        return new DomainAuthenticationInfo(dupToken.getUsername(), dupToken.getUserID(), password, realm, dupToken.getDomainID(), dupToken.getAppID(), null);
 	    }
 		else if (token instanceof JWTAuthenticationToken)
 		{
-			log.info("JWTAuthenticationToken based authentication");
+			//log.info("JWTAuthenticationToken based authentication");
 			// lookup AppDeviceDAO or SubjectAPIKey
 			// in oder to do that we need to switch the user to SUPER_ADMIN or DAEMON user
 			JWTAuthenticationToken jwtAuthToken = (JWTAuthenticationToken) token;
@@ -475,4 +444,19 @@ public abstract class ShiroBaseRealm
 			}
 		}
 	}
+	
+	 protected void doClearCache(PrincipalCollection principals) 
+	 {	
+		 log.info("principal to clear:" + principals);
+		 if(!isAuthenticationCachingEnabled())
+		 { 
+			 log.info("isAuthenticationCachingEnabled is no enabled for:" + principals);
+			 clearCachedAuthenticationInfo(principals);
+		 }
+		 if(!isAuthorizationCachingEnabled())
+		 {
+			 clearCachedAuthorizationInfo(principals);
+			 log.info("isAuthorizationCachingEnabled is no enabled for:" + principals);
+		 }
+	 }
 }
