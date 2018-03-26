@@ -130,6 +130,35 @@ public class ShiroJCache<K, V> implements Cache<K, V>{
 		 it.forEachRemaining(c);
 		return ret;
 	}
-
+	
+	public boolean equals(Object o)
+	{
+		if (o == this)
+		{
+			return true;
+		}
+		
+		javax.cache.Cache<?,?> temp = null;
+		if (o instanceof javax.cache.Cache)
+		{
+			temp = (javax.cache.Cache<?, ?>) o;
+		}	
+		else if (o instanceof ShiroJCache)
+		{
+			temp = ((ShiroJCache<?,?>)o).cache;
+		}
+		
+		if (temp != null)
+		{
+			cache.equals(temp);
+		}
+		
+		return false;
+	}
+	
+	public int hashCode()
+	{
+		return cache.hashCode();
+	}
 }
 

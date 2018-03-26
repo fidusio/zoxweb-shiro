@@ -19,6 +19,7 @@
          <ehcache.version>2.10.3</ehcache.version>
          <slf4j.version>1.7.25</slf4j.version>
          <common.logging.version>1.2</common.logging.version>
+         <org.ehcache.version>3.5.2</org.ehcache.version>
     </properties>
 
     <build>
@@ -90,22 +91,23 @@
             <artifactId>shiro-web</artifactId>
           
         </dependency>
+        <!--  
         <dependency>
       		<groupId>net.sf.ehcache</groupId>
       		<artifactId>ehcache</artifactId>
- 
     	</dependency>
+    	-->
         <dependency>
 	    	<groupId>javax.servlet</groupId>
 	    	<artifactId>javax.servlet-api</artifactId>
 		</dependency>
-        
+        <!--  
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-ehcache</artifactId>
-           
         </dependency>
-
+        -->
+		
 		   <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
@@ -132,6 +134,13 @@
 		  <groupId>javax.cache</groupId>
 		  <artifactId>cache-api</artifactId>
 		</dependency>
+		
+		<dependency>
+	      <groupId>org.ehcache</groupId>
+	      <artifactId>ehcache</artifactId>
+	      <version>${org.ehcache.version}</version>
+	    </dependency>
+	    
 
     </dependencies>
 

@@ -21,9 +21,10 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.apache.shiro.cache.CacheManager;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
+//import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.util.Destroyable;
 import org.apache.shiro.util.Initializable;
+import org.zoxweb.server.security.shiro.cache.ShiroJCacheManager;
 import org.zoxweb.shared.util.ResourceManager;
 
 /**
@@ -31,7 +32,8 @@ import org.zoxweb.shared.util.ResourceManager;
  *
  */
 public class ZWEhCacheManager
-    extends EhCacheManager
+    //extends EhCacheManager
+	extends ShiroJCacheManager
     implements CacheManager, Initializable, Destroyable
 {
 	public static final String RESOURCE_NAME = "ZW_EH_CACHE_MANAGER";
@@ -47,14 +49,14 @@ public class ZWEhCacheManager
 		implements Closeable
 	{
 		
-		final HashSet<EhCacheManager> cacheSet = new HashSet<>();
+		final HashSet<ShiroJCacheManager> cacheSet = new HashSet<>();
 		
 		CacheObject()
 		{
 			ResourceManager.SINGLETON.map(RESOURCE_NAME, this);
 		}
 		
-		void add(EhCacheManager eh)
+		void add(ShiroJCacheManager eh)
 		{
 			synchronized(cacheSet)
 			{
@@ -75,13 +77,13 @@ public class ZWEhCacheManager
 			
 				cacheSet.iterator();
 				
-				Iterator<EhCacheManager> it = cacheSet.iterator();
+				Iterator<ShiroJCacheManager> it = cacheSet.iterator();
 
 				while (it.hasNext())
 	            {
 					try
 	                {
-						EhCacheManager ecm = it.next();
+						ShiroJCacheManager ecm = it.next();
 						ecm.destroy();
 						log.info("Destroyed:" + ecm);
 					}

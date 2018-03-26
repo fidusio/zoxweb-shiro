@@ -76,6 +76,7 @@ public abstract class ShiroBaseRealm
 	private static final transient Logger log = Logger.getLogger(Const.LOGGER_NAME);
 
 	protected boolean permissionsLookupEnabled = false;
+	private boolean cachePersistenceEnabled = false;
 	
 	private APISecurityManager<Subject> apiSecurityManager;
 	
@@ -87,6 +88,8 @@ public abstract class ShiroBaseRealm
 	public void setAPISecurityManager(APISecurityManager<Subject> apiSecurityManager) {
 		this.apiSecurityManager = apiSecurityManager;
 	}
+
+	
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals)
@@ -127,11 +130,11 @@ public abstract class ShiroBaseRealm
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
 			throws AuthenticationException
 	{
-		//log.info("AuthenticationToken:" + token);
+		log.info("AuthenticationToken:" + token);
 		
 		if (token instanceof DomainUsernamePasswordToken)
 		{
-			//log.info("DomainUsernamePasswordToken based authentication");
+			log.info("DomainUsernamePasswordToken based authentication");
 			DomainUsernamePasswordToken dupToken = (DomainUsernamePasswordToken) token;
 	        //String userName = upToken.getUsername();
 	        //String domainID = upToken.getDomainID();
@@ -161,7 +164,7 @@ public abstract class ShiroBaseRealm
 	    }
 		else if (token instanceof JWTAuthenticationToken)
 		{
-			//log.info("JWTAuthenticationToken based authentication");
+			log.info("JWTAuthenticationToken based authentication");
 			// lookup AppDeviceDAO or SubjectAPIKey
 			// in oder to do that we need to switch the user to SUPER_ADMIN or DAEMON user
 			JWTAuthenticationToken jwtAuthToken = (JWTAuthenticationToken) token;
@@ -450,19 +453,34 @@ public abstract class ShiroBaseRealm
 	
 	 protected void doClearCache(PrincipalCollection principals) 
 	 {	
-		 
+	
 		 log.info("principal to clear:" + principals);
 		
-		 if(!isAuthenticationCachingEnabled())
-		 { 
-			 log.info("isAuthenticationCachingEnabled is no enabled for:" + principals);
-			 clearCachedAuthenticationInfo(principals);
-		 }
-		 if(!isAuthorizationCachingEnabled())
+		 if (!isCachePersistenceEnabled())
 		 {
-			 clearCachedAuthorizationInfo(principals);
-			 log.info("isAuthorizationCachingEnabled is no enabled for:" + principals);
+			 log.info("Super do clear cache");
+			 super.doClearCache(principals);
 		 }
+		 
+		 
+//		 if(!isAuthenticationCachingEnabled())
+//		 { 
+//			 log.info("isAuthenticationCachingEnabled is no enabled for:" + principals);
+//			 clearCachedAuthenticationInfo(principals);
+//		 }
+//		 else
+//		 {
+//			 log.info("isAuthenticationCaching not cleared");
+//		 }
+//		 if(!isAuthorizationCachingEnabled())
+//		 {
+//			 clearCachedAuthorizationInfo(principals);
+//			 log.info("isAuthorizationCachingEnabled is no enabled for:" + principals);
+//		 }
+//		 else
+//		 {
+//			 log.info("isAuthorizationCaching not cleared");
+//		 }
 	 }
 	 
 	 
@@ -524,5 +542,13 @@ public abstract class ShiroBaseRealm
 			 // or user id
 		 }
 	 }
+
+	public boolean isCachePersistenceEnabled() {
+		return cachePersistenceEnabled;
+	}
+
+	public void setCachePersistenceEnabled(boolean sessionLessModeEnabled) {
+		this.cachePersistenceEnabled = sessionLessModeEnabled;
+	}
 	 
 }

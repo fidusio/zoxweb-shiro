@@ -6,7 +6,8 @@ import java.lang.reflect.Method;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.zoxweb.server.security.shiro.authz.PermissionsProp;
+import org.zoxweb.server.security.shiro.authz.ManualPermissionsCheck;
+//import org.zoxweb.server.security.shiro.authz.PermissionsProp;
 import org.zoxweb.shared.annotation.DataProperties;
 
 public class ShiroResourcePropScanner
@@ -41,7 +42,7 @@ public class ShiroResourcePropScanner
 				}	
 			}
 			
-			ret = new ShiroResourcePropContainer(clazz, authc, rolesAnnot, permissionAnnot, null);
+			ret = new ShiroResourcePropContainer(clazz, authc, rolesAnnot, permissionAnnot);
 		}
 		
 		for(Method m : clazz.getMethods())
@@ -51,7 +52,7 @@ public class ShiroResourcePropScanner
 			boolean  authc = false;
 			RequiresPermissions permissionAnnot = null;
 			RequiresRoles rolesAnnot = null;
-			PermissionsProp permissionsProp = null;
+			ManualPermissionsCheck permissionsProp = null;
 			DataProperties dataProp = null;
 			
 			
@@ -70,9 +71,9 @@ public class ShiroResourcePropScanner
 				{
 					rolesAnnot = (RequiresRoles) a;
 				}
-				else if (a.annotationType() == PermissionsProp.class)
+				else if (a.annotationType() == ManualPermissionsCheck.class)
 				{
-					permissionsProp = (PermissionsProp) a;
+					permissionsProp = (ManualPermissionsCheck) a;
 				}
 				else if (a.annotationType() == DataProperties.class)
 				{

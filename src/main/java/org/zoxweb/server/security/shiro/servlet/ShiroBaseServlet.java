@@ -287,7 +287,20 @@ public abstract class ShiroBaseServlet
 		if (srpm != null)
 		{
 			// check for assigned permission or roles
-			if (srpm.permissions != null && (srpm.permissionProp == null || srpm.permissionProp.autoValidation()))
+			if (srpm.roles != null && srpm.manualPermissionsCheck == null)
+			{
+				try
+				{
+					ShiroUtil.checkRoles((srpm.roles.logical() == Logical.OR), SecurityUtils.getSubject(), srpm.roles.value());
+				}
+				catch(Exception e)
+				{
+					HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, new APIError(e));
+					return false;
+				}
+			}
+			
+			if (srpm.permissions != null && srpm.manualPermissionsCheck == null)
 			{
 				try
 				{

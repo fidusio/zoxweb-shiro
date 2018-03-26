@@ -36,8 +36,7 @@ public class JCacheTest {
 	{
 		long delta = System.currentTimeMillis();
 		
-		MutableConfiguration<String, Toto> configuration = new MutableConfiguration<String, Toto>();
-		configuration.setTypes(String.class, Toto.class)
+		MutableConfiguration<String, Toto> configuration = new MutableConfiguration<String, Toto>().setTypes(String.class, Toto.class)
 		.setExpiryPolicyFactory(JCacheExpiryPolicy.factoryOf(Duration.ETERNAL, new Duration(TimeUnit.MILLISECONDS, 500)))
 		.setStoreByValue(false);
 		
