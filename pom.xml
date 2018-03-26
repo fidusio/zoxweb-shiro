@@ -15,11 +15,9 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-         <ehcache-org.version>3.4.0</ehcache-org.version>
-         <ehcache.version>2.10.3</ehcache.version>
          <slf4j.version>1.7.25</slf4j.version>
          <common.logging.version>1.2</common.logging.version>
-         <org.ehcache.version>3.5.2</org.ehcache.version>
+     
     </properties>
 
     <build>
