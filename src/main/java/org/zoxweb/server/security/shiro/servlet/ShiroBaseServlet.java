@@ -214,7 +214,6 @@ public abstract class ShiroBaseServlet
                 	}
                 	catch(Exception e)
                 	{
-                		e.printStackTrace();
                 		reqAuth = AuthType.BEARER;
                 	}
                 }
