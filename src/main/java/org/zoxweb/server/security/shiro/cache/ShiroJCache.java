@@ -36,6 +36,8 @@ public class ShiroJCache<K, V> implements Cache<K, V>{
 	@Override
 	public V get(K key) throws CacheException {
 		// TODO Auto-generated method stub
+		 if (key == null)
+             return null;
 		return cache.get(key);
 	}
 
