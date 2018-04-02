@@ -180,16 +180,19 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 					break;
 				case ROLE_TO_SUBJECT:
 					ShiroRoleDAO role = sard.getAssociation();
-					roles.add(role.getSubjectID());
-					for (NVEntity nve : role.getPermissions().values())
+					if (role != null)
 					{
-						if (nve instanceof ShiroPermissionDAO)
+						roles.add(role.getSubjectID());
+						for (NVEntity nve : role.getPermissions().values())
 						{
-							ShiroPermissionDAO permission = (ShiroPermissionDAO) nve;
-							if (permission.getPermissionPattern() != null)
+							if (nve instanceof ShiroPermissionDAO)
 							{
-								//log.info("Adding permission : " + permission.getPermissionPattern());
-								stringPermissions.add(permission.getPermissionPattern());
+								ShiroPermissionDAO permission = (ShiroPermissionDAO) nve;
+								if (permission.getPermissionPattern() != null)
+								{
+									//log.info("Adding permission : " + permission.getPermissionPattern());
+									stringPermissions.add(permission.getPermissionPattern());
+								}
 							}
 						}
 					}

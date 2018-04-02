@@ -453,12 +453,9 @@ public abstract class ShiroBaseRealm
 	
 	 protected void doClearCache(PrincipalCollection principals) 
 	 {	
-	
-		 log.info("principal to clear:" + principals);
-		
 		 if (!isCachePersistenceEnabled())
 		 {
-			 log.info("Super do clear cache");
+			 log.info("principal to clear:" + principals);
 			 super.doClearCache(principals);
 		 }
 		 
@@ -486,6 +483,7 @@ public abstract class ShiroBaseRealm
 	 
 	 public void invalidate(String resourceID)
 	 {
+		 log.info("start for:" + resourceID);
 		 if (!SharedStringUtil.isEmpty(resourceID))
 		 {
 			 // check it is a subject key id
@@ -539,6 +537,8 @@ public abstract class ShiroBaseRealm
 				clearCachedAuthenticationInfo(principalCollection);
 				clearCachedAuthorizationInfo(principalCollection);
 			}
+			
+			 log.info("end for:" + resourceID);
 			 // or user id
 		 }
 	 }
