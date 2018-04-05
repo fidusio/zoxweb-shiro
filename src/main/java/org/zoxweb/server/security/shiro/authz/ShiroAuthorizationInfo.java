@@ -12,11 +12,15 @@ import java.util.logging.Logger;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.zoxweb.server.security.shiro.ShiroBaseRealm;
+import org.zoxweb.shared.data.AppIDDAO;
+import org.zoxweb.shared.security.model.PPEncoder;
+import org.zoxweb.shared.security.model.SecurityModel.PermissionToken;
 import org.zoxweb.shared.security.shiro.ShiroAssociationRuleDAO;
 import org.zoxweb.shared.security.shiro.ShiroPermissionDAO;
 import org.zoxweb.shared.security.shiro.ShiroRoleDAO;
 import org.zoxweb.shared.util.CRUD;
 import org.zoxweb.shared.util.NVEntity;
+import org.zoxweb.shared.util.NVPair;
 import org.zoxweb.shared.util.SharedUtil;
 
 
@@ -29,7 +33,19 @@ import org.zoxweb.shared.util.SharedUtil;
 public class ShiroAuthorizationInfo implements AuthorizationInfo
 {
 	
-	protected HashMap<String, ShiroAssociationRuleDAO> rulesMap = new HashMap<String, ShiroAssociationRuleDAO>();
+	static class RuleHolder
+	{
+		final ShiroAssociationRuleDAO sard;
+		final NVPair[] tokens;
+		RuleHolder(ShiroAssociationRuleDAO rule, NVPair[]  params)
+		{
+			this.sard = rule;
+			this.tokens = (params != null && params.length > 0) ? params : null ;
+		}
+		
+	}
+	
+	protected HashMap<String, RuleHolder> rulesMap = new HashMap<String, RuleHolder>();
 	protected Set<ShiroAssociationRuleDAO> dynamicSet = new HashSet<ShiroAssociationRuleDAO>();
 	protected Set<String> stringPermissions = null;
 	protected Set<String> roles = null;
@@ -76,7 +92,7 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 		this.realm = realm;
 	}
 	
-	public synchronized void addShiroAssociationRule(ShiroAssociationRuleDAO sard)
+	public synchronized void addShiroAssociationRule(ShiroAssociationRuleDAO sard, NVPair...nvps)
 	{
 		SharedUtil.checkIfNulls("Null ShiroAssociationRuleDAO", sard);
 		
@@ -87,7 +103,7 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 			return;
 		}
 		
-		rulesMap.put(sard.getReferenceID(), sard);
+		rulesMap.put(sard.getReferenceID(), new RuleHolder(sard, nvps));
 		dirty = true;
 	}
 	
@@ -103,7 +119,7 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 			return;
 		}
 		
-		rulesMap.put(sard.getPattern(), sard);
+		rulesMap.put(sard.getPattern(), new RuleHolder(sard, null));
 		dirty = true;
 	}
 	
@@ -128,10 +144,11 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 			stringPermissions.clear();
 			roles.clear();
 			objectPermissions.clear();
-			Iterator<ShiroAssociationRuleDAO> it = rulesMap.values().iterator();
+			Iterator<RuleHolder> it = rulesMap.values().iterator();
 			while(it.hasNext())
 			{
-				ShiroAssociationRuleDAO sard = it.next();
+				RuleHolder rh = it.next();
+				ShiroAssociationRuleDAO sard = rh.sard;
 				switch(sard.getAssociationType())
 				{
 				case PERMISSION_TO_ROLE:
@@ -191,10 +208,22 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 							if (nve instanceof ShiroPermissionDAO)
 							{
 								ShiroPermissionDAO permission = (ShiroPermissionDAO) nve;
-								if (permission.getPermissionPattern() != null)
+								String permissionPattern = permission.getPermissionPattern();
+								if (permissionPattern != null)
 								{
-									//log.info("Adding permission : " + permission.getPermissionPattern());
-									stringPermissions.add(permission.getPermissionPattern());
+									log.info("Original permission pattern:" + permissionPattern);
+									if (rh.tokens != null)
+									{
+										for (NVPair token: rh.tokens)
+										{
+											permissionPattern = PPEncoder.SINGLETON.encodePattern(permissionPattern, token);
+										}
+									}
+									
+									if (permission.getDomainID() != null && permission.getDomainID() != null)
+										permissionPattern = PPEncoder.SINGLETON.encodePattern(permissionPattern, PermissionToken.APP_ID, AppIDDAO.appIDSubjectID(permission.getDomainID(), permission.getAppID()));
+									log.info("Encoded permission pattern:" + permissionPattern);
+									stringPermissions.add(permissionPattern);
 								}
 							}
 						}
@@ -209,26 +238,26 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 	}
 	
 	
-	public synchronized void addShiroAssociationRule(List<ShiroAssociationRuleDAO> sards)
+	public synchronized void addShiroAssociationRule(List<ShiroAssociationRuleDAO> sards, NVPair ...nvps)
 	{
 		SharedUtil.checkIfNulls("Null ShiroAssociationRuleDAO", sards);
 		
 		for(ShiroAssociationRuleDAO sard : sards)
 		{
-			addShiroAssociationRule(sard);
+			addShiroAssociationRule(sard, nvps);
 		}
 	}
 	
 	
-	public synchronized void deleteShiroAssociationRule(ShiroAssociationRuleDAO sard)
-	{
-		
-	}
-	
-	public synchronized void updateShiroAssciationRule(ShiroAssociationRuleDAO sard)
-	{
-		
-	}
+//	public synchronized void deleteShiroAssociationRule(ShiroAssociationRuleDAO sard)
+//	{
+//		
+//	}
+//	
+//	public synchronized void updateShiroAssciationRule(ShiroAssociationRuleDAO sard)
+//	{
+//		
+//	}
 
 	@Override
 	public synchronized  Collection<String> getRoles() 
