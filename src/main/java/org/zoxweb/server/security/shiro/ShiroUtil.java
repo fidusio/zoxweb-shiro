@@ -35,7 +35,6 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 import org.apache.shiro.util.ThreadContext;
-import org.zoxweb.server.security.shiro.authc.DomainPrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.shiro.ShiroNVEntityCRUDs;

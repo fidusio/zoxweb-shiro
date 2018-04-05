@@ -16,6 +16,7 @@
 package org.zoxweb.server.security.shiro.authc;
 
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.zoxweb.server.security.shiro.DomainPrincipalCollection;
 
 @SuppressWarnings("serial")
 public class DomainAuthenticationInfo

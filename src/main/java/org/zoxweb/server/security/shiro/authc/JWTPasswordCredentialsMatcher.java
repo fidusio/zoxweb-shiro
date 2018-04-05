@@ -7,7 +7,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.zoxweb.server.security.CryptoUtil;
 import org.zoxweb.server.security.JWTProvider;
-
+import org.zoxweb.server.security.shiro.DomainPrincipalCollection;
 import org.zoxweb.shared.crypto.PasswordDAO;
 import org.zoxweb.shared.security.JWT;
 import org.zoxweb.shared.util.SharedStringUtil;

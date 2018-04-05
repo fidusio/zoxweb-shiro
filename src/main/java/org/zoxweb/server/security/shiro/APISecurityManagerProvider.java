@@ -817,6 +817,7 @@ public class APISecurityManagerProvider
 	public ShiroAssociationDAO addShiroAssociationDAO(ShiroAssociationDAO association)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		
 		return addShiroAssociationDAO(association);
 	}
 
@@ -824,6 +825,7 @@ public class APISecurityManagerProvider
 	public ShiroAssociationDAO removeShiroAssociationDAO(ShiroAssociationDAO association)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
+		
 		return  getShiroBaseRealm().removeShiroAssociationDAO(association);
 	}
 
@@ -832,6 +834,7 @@ public class APISecurityManagerProvider
 	public void addShiroRule(ShiroAssociationRuleDAO sard) {
 		// TODO Auto-generated method stub
 		SharedUtil.checkIfNulls("Null ShiroAssociationRuleDAO", sard, sard.getAssociationType());
+		
 		switch(sard.getAssociationType())
 		{
 		case PERMISSION_TO_ROLE:
@@ -845,6 +848,10 @@ public class APISecurityManagerProvider
 		case ROLE_TO_SUBJECT:
 			//checkRole()
 			break;
+		case PERMISSION_TO_RESOURCE:
+			break;
+		case ROLE_TO_RESOURCE:
+			break;
 		
 		
 		}
@@ -855,6 +862,7 @@ public class APISecurityManagerProvider
 	@Override
 	public void deleteShiroRule(ShiroAssociationRuleDAO sard) {
 		// TODO Auto-generated method stub
+		
 		getShiroBaseRealm().deleteShiroRule(sard);
 	}
 
@@ -862,6 +870,7 @@ public class APISecurityManagerProvider
 	@Override
 	public void updateShiroRule(ShiroAssociationRuleDAO sard) {
 		// TODO Auto-generated method stub
+		
 		getShiroBaseRealm().updateShiroRule(sard);
 	}
 
@@ -923,6 +932,34 @@ public class APISecurityManagerProvider
 	}
 
 
+	
+	public void checkPermission(NVEntity nve, String permission)
+			 throws NullPointerException, IllegalArgumentException, AccessException
+	{
+		if (!isPermitted(nve, permission))
+		{
+			throw new AccessException("Access Denied");
+		}
+	}
+	
+	
+	public  boolean isPermitted(NVEntity nve, String permission)
+			 throws NullPointerException, IllegalArgumentException
+	{
+		SharedUtil.checkIfNulls("Null parameters", nve, nve.getReferenceID(), permission);
+		
+		// the idea here is to match the permissions to the 
+		// the nve and current subject
+		ResourcePrincipalCollection nveRPC = new ResourcePrincipalCollection(nve);
+		org.apache.shiro.mgt.SecurityManager sm = SecurityUtils.getSecurityManager();
+		boolean result = sm.isPermitted(nveRPC, permission);
+		if (result)
+		{
+			result = ShiroUtil.isPermitted(permission);
+		}
+		
+		return result;
+	}
 
 	
 	

@@ -136,6 +136,8 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 				{
 				case PERMISSION_TO_ROLE:
 					break;
+				case PERMISSION_TO_RESOURCE:
+					break;
 				case PERMISSION_TO_SUBJECT:
 					if (sard.getAssociation() != null && sard.getAssociation() instanceof ShiroPermissionDAO)
 					{
@@ -179,6 +181,7 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 				case ROLE_TO_ROLEGROUP:
 					break;
 				case ROLE_TO_SUBJECT:
+				case ROLE_TO_RESOURCE:
 					ShiroRoleDAO role = sard.getAssociation();
 					if (role != null)
 					{
@@ -197,7 +200,8 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 						}
 					}
 					
-					break;	
+					break;
+
 				}
 			}
 			dirty = false;

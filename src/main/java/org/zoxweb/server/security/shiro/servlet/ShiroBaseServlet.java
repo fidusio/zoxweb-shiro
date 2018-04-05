@@ -367,7 +367,8 @@ public abstract class ShiroBaseServlet
             if (subject != null && subject.isAuthenticated())
             {
                 subject.logout();
-                log.info("AutoLogout invoked");  
+                log.info("AutoLogout invoked:" + SecurityUtils.getSecurityManager().getClass().getName());
+                
             }
         }
     }

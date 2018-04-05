@@ -35,7 +35,6 @@ import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.api.APIAppManagerProvider;
 import org.zoxweb.server.io.IOUtil;
 import org.zoxweb.server.security.shiro.authc.DomainAuthenticationInfo;
-import org.zoxweb.server.security.shiro.authc.DomainPrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.shared.api.APIAppManager;

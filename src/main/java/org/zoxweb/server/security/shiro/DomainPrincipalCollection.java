@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zoxweb.server.security.shiro.authc;
+package org.zoxweb.server.security.shiro;
 
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.zoxweb.shared.util.AppID;

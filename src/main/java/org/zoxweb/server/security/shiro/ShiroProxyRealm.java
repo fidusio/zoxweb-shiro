@@ -27,7 +27,6 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainAuthenticationInfo;
-import org.zoxweb.server.security.shiro.authc.DomainPrincipalCollection;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
 import org.zoxweb.shared.security.shiro.LoginStatusDAO;
 import org.zoxweb.shared.util.Const;
