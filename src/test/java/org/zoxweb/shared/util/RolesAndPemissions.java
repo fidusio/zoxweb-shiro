@@ -10,7 +10,7 @@ public class RolesAndPemissions {
 	{
 		try
 		{
-			ShiroPermissionDAO permision = SecurityModel.Permission.CREATE_FILE.toPermission("test.com", "batata");
+			ShiroPermissionDAO permision = SecurityModel.Permission.ADD_RESOURCE.toPermission("test.com", "batata");
 			System.out.println(GSONUtil.toJSON(permision, true));
 		
 		}
