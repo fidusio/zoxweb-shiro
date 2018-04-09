@@ -695,7 +695,7 @@ public class APISecurityManagerProvider
 	public ShiroRoleDAO addRole(ShiroRoleDAO role)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		checkPermissions(SecurityModel.Permission.ADD_ROLE.getValue());
+		checkPermissions(SecurityModel.Permission.ROLE_ADD.getValue());
 		return  getShiroBaseRealm().addRole(role);
 	}
 
@@ -711,7 +711,7 @@ public class APISecurityManagerProvider
 	public ShiroRoleDAO deleteRole(ShiroRoleDAO role, boolean withPermissions)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		checkPermissions(SecurityModel.Permission.DELETE_ROLE.getValue());
+		checkPermissions(SecurityModel.Permission.ROLE_DELETE.getValue());
 		return  getShiroBaseRealm().deleteRole(role, withPermissions);
 	}
 
@@ -719,7 +719,7 @@ public class APISecurityManagerProvider
 	public ShiroRoleDAO updateRole(ShiroRoleDAO role)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		checkPermissions(SecurityModel.Permission.UPDATE_ROLE.getValue());
+		checkPermissions(SecurityModel.Permission.ROLE_UPDATE.getValue());
 		return  getShiroBaseRealm().updateRole(role);
 	}
 
@@ -748,7 +748,7 @@ public class APISecurityManagerProvider
 	public ShiroPermissionDAO addPermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		checkPermissions(SecurityModel.Permission.ADD_PERMISSION.getValue());
+		checkPermissions(SecurityModel.Permission.PERMISSION_ADD.getValue());
 		return  getShiroBaseRealm().addPermission(permission);
 	}
 
@@ -763,7 +763,7 @@ public class APISecurityManagerProvider
 	public ShiroPermissionDAO deletePermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		checkPermissions(SecurityModel.Permission.DELETE_PERMISSION.getValue());
+		checkPermissions(SecurityModel.Permission.PERMISSION_DELETE.getValue());
 		return  getShiroBaseRealm().deletePermission(permission);
 	}
 
@@ -771,7 +771,7 @@ public class APISecurityManagerProvider
 	public ShiroPermissionDAO updatePermission(ShiroPermissionDAO permission)
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
-		checkPermissions(SecurityModel.Permission.UPTDATE_PERMISSION.getValue());
+		checkPermissions(SecurityModel.Permission.PERMISSION_UPDATE.getValue());
 		return  getShiroBaseRealm().updatePermission(permission);
 	}
 
