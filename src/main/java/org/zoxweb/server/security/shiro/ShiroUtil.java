@@ -26,12 +26,14 @@ import java.util.logging.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 import org.apache.shiro.util.ThreadContext;
@@ -495,12 +497,26 @@ public class ShiroUtil
 		return subject.isPermitted(SharedStringUtil.toLowerCase(permission));
 	}
 	
-	public boolean isPermitted(GetValue<String> gv)
+	public static boolean isPermitted(GetValue<String> gv)
 			throws NullPointerException, AccessException
 	{
 		SharedUtil.checkIfNulls("Null parameters not allowed", gv, gv.getValue());
 		return isPermitted(gv.getValue());
 	}
+	
+	public static AuthorizationInfo lookupAuthorizationInfo(Subject subject)
+	{
+		return lookupAuthorizationInfo(subject.getPrincipals());
+	}
+	
+	public static AuthorizationInfo lookupAuthorizationInfo(PrincipalCollection pc)
+	{
+		ShiroBaseRealm realm = ShiroUtil.getRealm(ShiroBaseRealm.class);
+		// set the permission manually
+		AuthorizationInfo ai =  realm.lookupAuthorizationInfo(pc);
+		return ai;
+	}
+	
 
 	public static Object lookupSessionAttribute(Object key)
     {

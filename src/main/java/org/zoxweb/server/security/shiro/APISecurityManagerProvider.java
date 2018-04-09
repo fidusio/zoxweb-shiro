@@ -951,8 +951,7 @@ public class APISecurityManagerProvider
 		// the idea here is to match the permissions to the 
 		// the nve and current subject
 		ResourcePrincipalCollection nveRPC = new ResourcePrincipalCollection(nve);
-		org.apache.shiro.mgt.SecurityManager sm = SecurityUtils.getSecurityManager();
-		boolean result = sm.isPermitted(nveRPC, permission);
+		boolean result = SecurityUtils.getSecurityManager().isPermitted(nveRPC, permission);
 		if (result)
 		{
 			result = ShiroUtil.isPermitted(permission);

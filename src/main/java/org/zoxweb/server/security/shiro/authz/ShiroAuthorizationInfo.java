@@ -2,10 +2,12 @@ package org.zoxweb.server.security.shiro.authz;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -45,8 +47,8 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 		
 	}
 	
-	protected HashMap<String, RuleHolder> rulesMap = new HashMap<String, RuleHolder>();
-	protected Set<ShiroAssociationRuleDAO> dynamicSet = new HashSet<ShiroAssociationRuleDAO>();
+	protected Map<String, RuleHolder> rulesMap = new LinkedHashMap<String, RuleHolder>();
+	protected Set<ShiroAssociationRuleDAO> dynamicSet = new LinkedHashSet<ShiroAssociationRuleDAO>();
 	protected Set<String> stringPermissions = null;
 	protected Set<String> roles = null;
 	protected Set<Permission> objectPermissions = null;
@@ -130,16 +132,16 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 		{
 			if (stringPermissions == null)
 			{
-				 stringPermissions = new HashSet<String>();
+				 stringPermissions = new LinkedHashSet<String>();
 			}
 			if (roles == null)
 			{
-				roles = new HashSet<String>();
+				roles = new LinkedHashSet<String>();
 			}
 			
 			if (objectPermissions == null)
 			{
-				objectPermissions = new HashSet<Permission>();
+				objectPermissions = new LinkedHashSet<Permission>();
 			}
 			stringPermissions.clear();
 			roles.clear();
@@ -211,7 +213,7 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 								String permissionPattern = permission.getPermissionPattern();
 								if (permissionPattern != null)
 								{
-									log.info("Original permission pattern:" + permissionPattern);
+									//log.info("Original permission pattern:" + permissionPattern);
 									if (rh.tokens != null)
 									{
 										for (NVPair token: rh.tokens)
@@ -222,7 +224,7 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 									
 									if (permission.getDomainID() != null && permission.getDomainID() != null)
 										permissionPattern = PPEncoder.SINGLETON.encodePattern(permissionPattern, PermissionToken.APP_ID, AppIDDAO.appIDSubjectID(permission.getDomainID(), permission.getAppID()));
-									log.info("Encoded permission pattern:" + permissionPattern);
+									//log.info("Encoded permission pattern:" + permissionPattern);
 									stringPermissions.add(permissionPattern);
 								}
 							}
