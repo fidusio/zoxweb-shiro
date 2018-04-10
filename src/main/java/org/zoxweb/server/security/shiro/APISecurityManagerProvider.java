@@ -943,21 +943,27 @@ public class APISecurityManagerProvider
 	}
 	
 	
-	public  boolean isPermitted(NVEntity nve, String permission)
+	public boolean isPermitted(NVEntity nve, String permission)
 			 throws NullPointerException, IllegalArgumentException
 	{
 		SharedUtil.checkIfNulls("Null parameters", nve, nve.getReferenceID(), permission);
-		
-		// the idea here is to match the permissions to the 
-		// the nve and current subject
-		ResourcePrincipalCollection nveRPC = new ResourcePrincipalCollection(nve);
-		boolean result = SecurityUtils.getSecurityManager().isPermitted(nveRPC, permission);
+		boolean result = ShiroUtil.isPermitted(permission);
 		if (result)
 		{
-			result = ShiroUtil.isPermitted(permission);
-		}
-		
+			// the idea here is to match the permissions to the 
+			// the nve and current subject
+			ResourcePrincipalCollection nveRPC = new ResourcePrincipalCollection(nve);
+			result = SecurityUtils.getSecurityManager().isPermitted(nveRPC, permission);
+		}		
 		return result;
+	}
+	
+	
+	public boolean isPermitted(String permissions)
+			 throws NullPointerException, IllegalArgumentException
+	{
+		
+		return  ShiroUtil.isPermitted(permissions);
 	}
 
 	
