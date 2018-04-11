@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -240,7 +239,7 @@ public class ShiroAuthorizationInfo implements AuthorizationInfo
 	}
 	
 	
-	public synchronized void addShiroAssociationRule(List<ShiroAssociationRuleDAO> sards, NVPair ...nvps)
+	public synchronized void addShiroAssociationRule(Collection<ShiroAssociationRuleDAO> sards, NVPair ...nvps)
 	{
 		SharedUtil.checkIfNulls("Null ShiroAssociationRuleDAO", sards);
 		
