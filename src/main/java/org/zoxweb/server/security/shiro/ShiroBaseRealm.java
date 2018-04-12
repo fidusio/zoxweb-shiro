@@ -64,7 +64,6 @@ import org.zoxweb.shared.util.Const.RelationalOperator;
 import org.zoxweb.shared.util.ResourceManager.Resource;
 import org.zoxweb.shared.util.SharedStringUtil;
 import org.zoxweb.shared.util.MetaToken;
-import org.zoxweb.shared.util.NVEntity;
 import org.zoxweb.shared.util.ResourceManager;
 import org.zoxweb.shared.util.SharedUtil;
 
@@ -254,17 +253,17 @@ public abstract class ShiroBaseRealm
 			throws NullPointerException, IllegalArgumentException, AccessException {
 		// TODO Auto-generated method stub
 		
-		if (role.getPermissions() != null)
-		{
-			for(NVEntity nve : (NVEntity[])role.getPermissions().values())
-			{
-				ShiroPermissionDAO existingPerm = lookupPermission(((ShiroPermissionDAO)nve).getSubjectID());
-				if (existingPerm != null)
-				{
-					
-				}
-			}
-		}
+//		if (role.getPermissions() != null)
+//		{
+//			for(NVEntity nve : (NVEntity[])role.getPermissions().values())
+//			{
+//				ShiroPermissionDAO existingPerm = lookupPermission(((ShiroPermissionDAO)nve).getSubjectID());
+//				if (existingPerm != null)
+//				{
+//					
+//				}
+//			}
+//		}
 		
 		
 		return getAPIDataStore().insert(role);
