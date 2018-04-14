@@ -287,7 +287,7 @@ public abstract class ShiroBaseServlet
 		if (srpm != null)
 		{
 			// check for assigned permission or roles
-			if (srpm.roles != null && srpm.manualPermissionsCheck == null)
+			if (srpm.roles != null && srpm.manualAuthorizationCheck == null)
 			{
 				try
 				{
@@ -300,7 +300,7 @@ public abstract class ShiroBaseServlet
 				}
 			}
 			
-			if (srpm.permissions != null && srpm.manualPermissionsCheck == null)
+			if (srpm.permissions != null && srpm.manualAuthorizationCheck == null)
 			{
 				try
 				{

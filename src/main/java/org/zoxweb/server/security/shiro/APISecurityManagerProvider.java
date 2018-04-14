@@ -966,6 +966,9 @@ public class APISecurityManagerProvider
 		return  ShiroUtil.isPermitted(permissions);
 	}
 
+
+	
+
 	
 	
 }
