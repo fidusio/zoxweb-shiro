@@ -345,14 +345,12 @@ public abstract class ShiroBaseServlet
 					throw new APIException("Content not matching", Reason.INCOMPLETE);
 				}
 			}
-			else
+			else if (dct.dataRequired())
 			{
 				// we have an empty content check if it is allowed
-				if (dct.dataRequired())
-				{
-					// we have missing content generate error
-					throw new APIException("Content empty", Reason.INCOMPLETE);
-				}
+				// we have missing content generate error
+				throw new APIException("Content empty", Reason.INCOMPLETE);
+				
 			}
 			
 		}
