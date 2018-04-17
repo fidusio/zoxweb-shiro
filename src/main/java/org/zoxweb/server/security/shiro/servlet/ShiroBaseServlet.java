@@ -416,6 +416,7 @@ public abstract class ShiroBaseServlet
         	}
         	catch(AccessException | APIException | NullPointerException | IllegalArgumentException e)
         	{
+        		
         		if (e instanceof ExceptionReason)
         		{
         			switch(((ExceptionReason) e).getReason())
@@ -443,6 +444,10 @@ public abstract class ShiroBaseServlet
         			HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.INTERNAL_SERVER_ERROR, e.getMessage());
         		}
         	}
+//        	catch(Exception e)
+//        	{
+//        		e.printStackTrace();
+//        	}
         }
         finally
         {

@@ -419,8 +419,10 @@ public abstract class ShiroBaseRealm
 		
 		if (ret != null && ret.size() == 1)
 		{
+			log.info("Role found " + ret);
 			return ret.get(0);
 		}
+		log.info("Role not found");
 		return null;
 	}
 	
