@@ -1,6 +1,7 @@
 package org.zoxweb.server.security.shiro;
 
 
+import java.util.Collection;
 import java.util.List;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -860,7 +861,8 @@ public class APISecurityManagerProvider
 
 
 	@Override
-	public void deleteShiroRule(ShiroAssociationRuleDAO sard) {
+	public void deleteShiroRule(ShiroAssociationRuleDAO sard) 
+	{
 		// TODO Auto-generated method stub
 		
 		getShiroBaseRealm().deleteShiroRule(sard);
@@ -877,6 +879,12 @@ public class APISecurityManagerProvider
 
 	@Override
 	public List<ShiroAssociationRuleDAO> search(QueryMarker... queryCriteria) {
+		// TODO Auto-generated method stub
+		return getShiroBaseRealm().search(queryCriteria);
+	}
+	
+	
+	public List<ShiroAssociationRuleDAO> search(Collection<QueryMarker> queryCriteria) {
 		// TODO Auto-generated method stub
 		return getShiroBaseRealm().search(queryCriteria);
 	}
