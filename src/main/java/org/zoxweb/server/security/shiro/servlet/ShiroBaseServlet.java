@@ -37,7 +37,7 @@ import org.zoxweb.server.security.shiro.ShiroResourcePropScanner;
 import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.server.util.GSONUtil;
-
+import org.zoxweb.server.util.cache.JWTTokenCache;
 import org.zoxweb.shared.annotation.DataProperties;
 import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.api.APIException;
@@ -201,6 +201,13 @@ public abstract class ShiroBaseServlet
     	    	
                 	try
                 	{
+                		
+                		JWTTokenCache jwtCache = ResourceManager.SINGLETON.lookup(ResourceManager.Resource.JWT_CACHE);
+                		if(jwtCache != null)
+                		{
+                			// if the cache is available check the cache
+                			jwtCache.map(jwtToken);
+                		}
                 		JWTAuthenticationToken authToken = new JWTAuthenticationToken(jwtToken);
                 		subject = SecurityUtils.getSubject();
                 		subject.login(authToken);
