@@ -183,6 +183,8 @@ public abstract class ShiroBaseServlet
     {
         if (isSecurityCheckRequired(httpMethod, req))
         {
+        	
+        	Exception exp = null;
             Subject subject = SecurityUtils.getSubject();
             AuthType reqAuth = AuthType.NONE;
 
@@ -221,6 +223,7 @@ public abstract class ShiroBaseServlet
                 	}
                 	catch(Exception e)
                 	{
+                		exp = e;
                 		reqAuth = AuthType.BEARER;
                 	}
                 }
@@ -275,7 +278,7 @@ public abstract class ShiroBaseServlet
                 }
                 else
                 {
-                	HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, DEFAULT_API_ERROR);
+                	HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, exp != null ? new APIError(exp) : DEFAULT_API_ERROR);
                 }
                 return false;
             }
