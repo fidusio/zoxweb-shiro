@@ -17,7 +17,7 @@ package org.zoxweb.server.security.shiro.servlet;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -77,6 +77,7 @@ public abstract class ShiroBaseServlet
     protected boolean isSecurityCheckRequired = false;
     protected boolean isAutoLogout = false;
     protected boolean isAppIDInPath = false;
+    private static AtomicLong serviceCounter = new AtomicLong();
     //protected  Map<HTTPMethod, DataProperties> httpResourceAccessProps = new HashMap<HTTPMethod, DataProperties>();
     protected ShiroResourcePropContainer resourceProps = null;
     
@@ -386,6 +387,7 @@ public abstract class ShiroBaseServlet
         throws ServletException, IOException
     {
         long delta = System.nanoTime();
+        serviceCounter.incrementAndGet();
 
         try
         {
@@ -463,7 +465,7 @@ public abstract class ShiroBaseServlet
         {
         	postService(req, res);
             delta = System.nanoTime() - delta;
-            log.info(getServletName() + ":" + req.getMethod() + ":PT:" + Const.TimeInMillis.nanosToString(delta));
+            log.info(getServletName() + ":" + req.getMethod() + ":PT:" + Const.TimeInMillis.nanosToString(delta) +":TOTAL CALLS:" + serviceCounter.get());
         }
     }
 
