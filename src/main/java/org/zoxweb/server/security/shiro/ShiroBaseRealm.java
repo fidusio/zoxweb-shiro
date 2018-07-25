@@ -121,6 +121,39 @@ public abstract class ShiroBaseRealm
 
        throw new AuthorizationException("Not a domain info");
 	}
+	
+	
+	protected Object getAuthenticationCacheKey(AuthenticationToken token) {
+		log.info("TAG1::key:" + token);
+		if(token instanceof JWTAuthenticationToken)
+		{
+			return ((JWTAuthenticationToken)token).getJWTSubjectID();
+		}
+		return super.getAuthenticationCacheKey(token);
+    }
+	
+	 protected Object getAuthenticationCacheKey(PrincipalCollection principals) 
+	 {
+		 log.info("TAG2::key:" + principals);
+		 if (principals instanceof DomainPrincipalCollection)
+		 {
+				DomainPrincipalCollection dpc = (DomainPrincipalCollection)principals;
+				return dpc.getJWSubjectID() != null ? dpc.getJWSubjectID() : dpc.getPrimaryPrincipal();
+		 }
+		 return super.getAuthenticationCacheKey(principals);
+	  }
+	
+	
+	protected Object getAuthorizationCacheKey(PrincipalCollection principals) 
+	{
+		log.info("TAG3:" + principals + " " + principals.getClass());
+		if (principals instanceof DomainPrincipalCollection)
+		{
+			DomainPrincipalCollection dpc = (DomainPrincipalCollection)principals;
+			return dpc.getJWSubjectID() != null ? dpc.getJWSubjectID() : dpc.getPrimaryPrincipal();
+		}
+		return super.getAuthorizationCacheKey(principals);
+    }
 
 	/**
 	 * @see org.apache.shiro.realm.AuthenticatingRealm#doGetAuthenticationInfo(org.apache.shiro.authc.AuthenticationToken)
@@ -498,7 +531,7 @@ public abstract class ShiroBaseRealm
 	 
 	 public void invalidate(String resourceID)
 	 {
-		 log.info("start for:" + resourceID);
+		 //log.info("start for:" + resourceID);
 		 if (!SharedStringUtil.isEmpty(resourceID))
 		 {
 			 // check it is a subject key id
@@ -507,7 +540,7 @@ public abstract class ShiroBaseRealm
 			SimplePrincipalCollection principalCollection = null;
 			try
 			{
-				log.info("ResourceID:" + resourceID);
+				//log.info("ResourceID:" + resourceID);
 				APISecurityManager<Subject> sm = ResourceManager.SINGLETON.lookup(Resource.API_SECURITY_MANAGER);
 				APIAppManager appManager =  ResourceManager.SINGLETON.lookup(Resource.API_APP_MANAGER);
 				// try subject api key first
@@ -520,7 +553,7 @@ public abstract class ShiroBaseRealm
 						UserIDDAO userIDDAO = lookupUserID(sak.getUserID(), "_id", "_user_id", "primary_email");
 						if (userIDDAO != null)
 						{
-							log.info("We have a subject api key:" + sak.getSubjectID());
+							//log.info("We have a subject api key:" + sak.getSubjectID());
 							principalCollection = new DomainPrincipalCollection(userIDDAO.getSubjectID(), null, getName(), null, null, sak.getSubjectID());
 						}
 					}
@@ -532,7 +565,7 @@ public abstract class ShiroBaseRealm
 					UserIDDAO userIDDAO = lookupUserID(resourceID, "_id", "_user_id", "primary_email");
 					if (userIDDAO != null)
 					{
-						log.info("We have a user:" + userIDDAO.getSubjectID());
+						//log.info("We have a user:" + userIDDAO.getSubjectID());
 						principalCollection = new DomainPrincipalCollection(userIDDAO.getSubjectID(), null, getName(), null, null, null);
 					}
 				}
@@ -552,8 +585,10 @@ public abstract class ShiroBaseRealm
 				clearCachedAuthenticationInfo(principalCollection);
 				clearCachedAuthorizationInfo(principalCollection);
 			}
-			
-			 log.info("end for:" + resourceID);
+			else
+			{
+				log.info("NOT FOUND!!:" + resourceID);
+			}
 			 // or user id
 		 }
 	 }

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import javax.cache.Cache.Entry;
 
@@ -19,6 +20,7 @@ public class ShiroJCache<K, V> implements Cache<K, V>{
 
 	private javax.cache.Cache<K, V> cache;
 	private JCacheListener<K,V> cacheListener = new JCacheListener<K,V>();
+	private static Logger log = Logger.getLogger(ShiroJCache.class.getName());
  	
 	
 	
@@ -38,13 +40,17 @@ public class ShiroJCache<K, V> implements Cache<K, V>{
 		// TODO Auto-generated method stub
 		 if (key == null)
              return null;
-		return cache.get(key);
+		 
+		 V v = cache.get(key);
+		 //log.info("key:" + key + " value:" + v);
+		return v;
 	}
 
 	@Override
 	public V put(K key, V value) throws CacheException {
 		SharedUtil.checkIfNulls("Null key or value", key, value);
 		// TODO Auto-generated method stub
+		 //log.info(key.getClass()+":key:" + key + " " +value.getClass() + ":value:" + value);
 		return cache.getAndPut(key, value);
 	}
 
@@ -60,6 +66,7 @@ public class ShiroJCache<K, V> implements Cache<K, V>{
 	public void clear() throws CacheException {
 		// TODO Auto-generated method stub
 		cache.clear();
+		log.info("Cleared");
 	}
 
 	@Override
