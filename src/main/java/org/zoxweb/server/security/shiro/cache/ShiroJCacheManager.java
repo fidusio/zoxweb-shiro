@@ -69,7 +69,7 @@ public class ShiroJCacheManager
 			throws CacheException
 	{
 		
-		log.info("cacheName:" + cacheName);
+		//log.info("cacheName:" + cacheName);
 		javax.cache.Cache<K, V> ret = cacheManager.getCache(cacheName);
 		
 		if(ret == null)
