@@ -10,7 +10,9 @@ import org.zoxweb.server.security.JWTProvider;
 import org.zoxweb.server.security.shiro.DomainPrincipalCollection;
 import org.zoxweb.shared.crypto.PasswordDAO;
 import org.zoxweb.shared.security.JWT;
+import org.zoxweb.shared.security.SubjectAPIKey;
 import org.zoxweb.shared.util.SharedStringUtil;
+import org.zoxweb.shared.util.Const.Status;
 
 public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 	protected static final transient Logger log = Logger.getLogger(JWTPasswordCredentialsMatcher.class.getName());
@@ -56,10 +58,23 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 	
 				return CryptoUtil.isPasswordValid(passwordDAO, password);
 			}
-			else if (info.getCredentials() instanceof byte[] && token instanceof JWTAuthenticationToken)
+			else if (info.getCredentials() instanceof SubjectAPIKey && token instanceof JWTAuthenticationToken)
 			{
 				//log.info("JWTAuthenticationToken");
-				JWT jwt = JWTProvider.SINGLETON.decode((byte[]) info.getCredentials(), (String)token.getCredentials());
+				SubjectAPIKey sak = (SubjectAPIKey) info.getCredentials();
+				if (sak.getStatus() != Status.ACTIVE)
+				{
+					// not active anymore
+					return false;
+				}
+				if (sak.getExpiryDate() != 0)
+				{
+					if (System.currentTimeMillis() > sak.getExpiryDate())
+					{
+						return false;
+					}
+				}
+				JWT jwt = JWTProvider.SINGLETON.decode(sak.getAPIKeyAsBytes(), (String)token.getCredentials());
 				if (info instanceof DomainAuthenticationInfo)
 				{
 					DomainAuthenticationInfo dai = (DomainAuthenticationInfo) info;

@@ -227,7 +227,8 @@ public abstract class ShiroBaseRealm
 				    appID    = ((AppDeviceDAO) sak).getAppID();
 			    }
 			    
-			    DomainAuthenticationInfo ret =  new DomainAuthenticationInfo(jwtAuthToken.getSubjectID(), sak.getUserID(), sak.getAPIKeyAsBytes(), getName(), domainID, appID, jwtAuthToken.getJWTSubjectID());
+			    DomainAuthenticationInfo ret =  new DomainAuthenticationInfo(jwtAuthToken.getSubjectID(), sak.getUserID(), sak //sak.getAPIKeyAsBytes()
+			    		, getName(), domainID, appID, jwtAuthToken.getJWTSubjectID());
 			    
 			    return ret;
 			}
