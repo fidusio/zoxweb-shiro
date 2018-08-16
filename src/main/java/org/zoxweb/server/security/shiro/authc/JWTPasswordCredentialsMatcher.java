@@ -55,7 +55,7 @@ public class JWTPasswordCredentialsMatcher implements CredentialsMatcher {
 				{
 					password = (String) token.getCredentials();
 				}
-	
+				
 				return CryptoUtil.isPasswordValid(passwordDAO, password);
 			}
 			else if (info.getCredentials() instanceof SubjectAPIKey && token instanceof JWTAuthenticationToken)
