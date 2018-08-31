@@ -124,7 +124,7 @@ public abstract class ShiroBaseRealm
 	
 	
 	protected Object getAuthenticationCacheKey(AuthenticationToken token) {
-		log.info("TAG1::key:" + token);
+		//log.info("TAG1::key:" + token);
 		if(token instanceof JWTAuthenticationToken)
 		{
 			return ((JWTAuthenticationToken)token).getJWTSubjectID();
@@ -134,7 +134,7 @@ public abstract class ShiroBaseRealm
 	
 	 protected Object getAuthenticationCacheKey(PrincipalCollection principals) 
 	 {
-		 log.info("TAG2::key:" + principals);
+		 //log.info("TAG2::key:" + principals);
 		 if (principals instanceof DomainPrincipalCollection)
 		 {
 				DomainPrincipalCollection dpc = (DomainPrincipalCollection)principals;
@@ -146,7 +146,7 @@ public abstract class ShiroBaseRealm
 	
 	protected Object getAuthorizationCacheKey(PrincipalCollection principals) 
 	{
-		log.info("TAG3:" + principals + " " + principals.getClass());
+		//log.info("TAG3:" + principals + " " + principals.getClass());
 		if (principals instanceof DomainPrincipalCollection)
 		{
 			DomainPrincipalCollection dpc = (DomainPrincipalCollection)principals;
@@ -162,11 +162,11 @@ public abstract class ShiroBaseRealm
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
 			throws AuthenticationException
 	{
-		log.info("AuthenticationToken:" + token);
+		//log.info("AuthenticationToken:" + token);
 		
 		if (token instanceof DomainUsernamePasswordToken)
 		{
-			log.info("DomainUsernamePasswordToken based authentication");
+			//log.info("DomainUsernamePasswordToken based authentication");
 			DomainUsernamePasswordToken dupToken = (DomainUsernamePasswordToken) token;
 	        //String userName = upToken.getUsername();
 	        //String domainID = upToken.getDomainID();
@@ -196,7 +196,7 @@ public abstract class ShiroBaseRealm
 	    }
 		else if (token instanceof JWTAuthenticationToken)
 		{
-			log.info("JWTAuthenticationToken based authentication");
+			//log.info("JWTAuthenticationToken based authentication");
 			// lookup AppDeviceDAO or SubjectAPIKey
 			// in oder to do that we need to switch the user to SUPER_ADMIN or DAEMON user
 			JWTAuthenticationToken jwtAuthToken = (JWTAuthenticationToken) token;

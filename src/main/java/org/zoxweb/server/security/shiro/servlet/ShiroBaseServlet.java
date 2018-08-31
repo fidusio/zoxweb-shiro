@@ -192,7 +192,7 @@ public abstract class ShiroBaseServlet
             if (subject == null || !subject.isAuthenticated())
             {
             	
-                log.info("security check required and user not authenticated");
+                //log.info("security check required and user not authenticated");
                 // check authentication token first
                 // and try to login
                 // 2 modes are supported BasicAuthenticatio and JWT
@@ -214,11 +214,11 @@ public abstract class ShiroBaseServlet
                 		JWTAuthenticationToken authToken = new JWTAuthenticationToken(jwtToken);
                 		subject = SecurityUtils.getSubject();
                 		subject.login(authToken);
-                		log.info("Implicit login activated");
-                		long ts = System.currentTimeMillis();
+                		//log.info("Implicit login activated");
+                		//long ts = System.currentTimeMillis();
                 		if (jwtToken.getJWT().getPayload().getIssuedAt() != 0)
                 		{
-                			log.info("JWT IAT:" + jwtToken.getJWT().getPayload().getIssuedAt() + " time difference between s/c " + (ts - jwtToken.getJWT().getPayload().getIssuedAt() ));
+                			//log.info("JWT IAT:" + jwtToken.getJWT().getPayload().getIssuedAt() + " time difference between s/c " + (ts - jwtToken.getJWT().getPayload().getIssuedAt() ));
                 		}
                 		return true;
                 	}
@@ -262,8 +262,8 @@ public abstract class ShiroBaseServlet
                 	}
                 }
                 
-                log.info("ReqAuth:" +reqAuth);
-                log.info(hra.getPathInfo());
+                //log.info("ReqAuth:" +reqAuth);
+                //log.info(hra.getPathInfo());
                 
                 if (reqAuth == AuthType.NONE)  	
                 {
