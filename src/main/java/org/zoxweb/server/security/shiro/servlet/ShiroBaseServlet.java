@@ -428,8 +428,6 @@ public abstract class ShiroBaseServlet
         	}
         	catch(AccessException | APIException | NullPointerException | IllegalArgumentException e)
         	{
-        		
-        		
         		if (e instanceof ExceptionReason)
         		{
         		   HTTPStatusCode sCode = HTTPStatusCode.statusByCode(((ExceptionReason)e).getStatusCode());
