@@ -429,21 +429,25 @@ public abstract class ShiroBaseServlet
         	catch(AccessException | APIException | NullPointerException | IllegalArgumentException e)
         	{
         		
+        		
         		if (e instanceof ExceptionReason)
         		{
+        		   HTTPStatusCode sCode = HTTPStatusCode.statusByCode(((ExceptionReason)e).getStatusCode());
+                  
         			switch(((ExceptionReason) e).getReason())
         			{
 					case ACCESS_DENIED:
-						HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.FORBIDDEN, new APIError(e));
+						HTTPServletUtil.sendJSON(req, res, sCode != null ? sCode : HTTPStatusCode.FORBIDDEN, new APIError(e));
+						
 						break;
 					case UNAUTHORIZED:
-						HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.UNAUTHORIZED, new APIError(e));
+						HTTPServletUtil.sendJSON(req, res, sCode != null ? sCode : HTTPStatusCode.UNAUTHORIZED, new APIError(e));
 						break;
 					case INCOMPLETE:
-						HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.BAD_REQUEST, new APIError(e));
+						HTTPServletUtil.sendJSON(req, res, sCode != null ? sCode : HTTPStatusCode.BAD_REQUEST, new APIError(e));
 						break;
 					case NOT_FOUND:
-						HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.NOT_FOUND, new APIError(e));
+						HTTPServletUtil.sendJSON(req, res, sCode != null ? sCode : HTTPStatusCode.NOT_FOUND, new APIError(e));
 						break;
         			}
         		}
@@ -455,7 +459,9 @@ public abstract class ShiroBaseServlet
         		{
         			HTTPServletUtil.sendJSON(req, res, HTTPStatusCode.INTERNAL_SERVER_ERROR, e.getMessage());
         		}
+        		
         	}
+        		
 //        	catch(Exception e)
 //        	{
 //        		e.printStackTrace();
