@@ -243,9 +243,8 @@ public abstract class ShiroBaseServlet
                 			
                 			// check in the app id is required and in present in the uri
                 			if(isAppIDPathRequired(req) && appIDURI == null)
-                			{
-                				
-                				throw new APIException();
+                			{	
+                				throw new APIException("Missing API ID", HTTPStatusCode.NOT_FOUND.CODE);
                 			}
                 			
                 			
@@ -393,6 +392,7 @@ public abstract class ShiroBaseServlet
         {
         	
         	HTTPMethod hm = HTTPMethod.lookup(req.getMethod());
+     
         	if (hm == null)
         	{
         		super.service(req, res);
