@@ -54,7 +54,7 @@ public class ShiroProxyRealm extends AuthorizingRealm
 		HashSet<String> roles = new HashSet<String>();
 
 		for (NVPair nvp: lsDAO.getUserRoles()) {
-			roles.add( nvp.getValue());
+			roles.add(nvp.getValue());
 		}
 
 		SimpleAuthorizationInfo ret = new SimpleAuthorizationInfo( roles);
@@ -109,7 +109,7 @@ public class ShiroProxyRealm extends AuthorizingRealm
 			catch (Exception e)
             {
 				e.printStackTrace();
-				throw new AuthenticationException( e.getMessage());
+				throw new AuthenticationException(e.getMessage());
 			}
 		}
 		
