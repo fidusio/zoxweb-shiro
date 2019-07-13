@@ -15,7 +15,7 @@
  */
 package org.zoxweb.server.security.shiro;
 
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,15 +27,15 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.config.Ini;
-import org.apache.shiro.config.IniSecurityManagerFactory;
+//import org.apache.shiro.config.Ini;
+//import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.Factory;
+//import org.apache.shiro.util.Factory;
 import org.apache.shiro.util.ThreadContext;
 import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
 import org.zoxweb.shared.security.AccessException;
@@ -52,7 +52,7 @@ import org.zoxweb.shared.util.SharedUtil;
 public class ShiroUtil
 {
 	
-	private static final Logger log = Logger.getLogger(Const.LOGGER_NAME);
+	public static final Logger log = Logger.getLogger(Const.LOGGER_NAME);
 	
 	public static boolean login(String domain, String realm, String username, String password)
     {
@@ -307,22 +307,22 @@ public class ShiroUtil
 		}
 	}	
 
-	public static SecurityManager loadSecurityManager(String shiroInitFile)
-    {
-		Factory<SecurityManager> factory = new IniSecurityManagerFactory(shiroInitFile);
-        log.info("Class:"+ factory.getClass());
-        return factory.getInstance();
-	}
-
-	public static SecurityManager loadSecurityManager(InputStream is)
-    {
-		Ini ini = new Ini();
-		ini.load(is);
-		Factory<SecurityManager> factory = new IniSecurityManagerFactory(ini);
-        log.info("Class:"+ factory.getClass());
-
-        return factory.getInstance();
-	}
+//	public static SecurityManager loadSecurityManager(String shiroInitFile)
+//    {
+//		Factory<SecurityManager> factory = new IniSecurityManagerFactory(shiroInitFile);
+//        log.info("Class:"+ factory.getClass());
+//        return factory.getInstance();
+//	}
+//
+//	public static SecurityManager loadSecurityManager(InputStream is)
+//    {
+//		Ini ini = new Ini();
+//		ini.load(is);
+//		Factory<SecurityManager> factory = new IniSecurityManagerFactory(ini);
+//        log.info("Class:"+ factory.getClass());
+//
+//        return factory.getInstance();
+//	}
 
 	public static void checkPermission(String permission, ShiroTokenReplacement str)
         throws NullPointerException, AccessException
