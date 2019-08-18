@@ -320,10 +320,10 @@ public class ShiroUtil
 
 	public static SecurityManager loadSecurityManager(InputStream is)
     {
-		Ini ini = new Ini();
-		ini.load(is);
-		Factory<SecurityManager> factory = new IniSecurityManagerFactory(ini);
-        log.info("Class:"+ factory.getClass());
+			Ini ini = new Ini();
+			ini.load(is);
+			Factory<SecurityManager> factory = new IniSecurityManagerFactory(ini);
+					log.info("Class:"+ factory.getClass());
 
         return factory.getInstance();
 	}
