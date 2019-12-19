@@ -15,15 +15,17 @@
  */
 package org.zoxweb.server.security.shiro.servlet;
 
+
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
+import java.util.logging.Logger;
 
 public class ShiroWebSocketSessionConfigurator
     extends ServerEndpointConfig.Configurator
 {
     public static final String HTTP_SESSION = "http_session";
-
+    private static final Logger log = Logger.getLogger(ShiroWebSocketSessionConfigurator.class.getName());
     @Override
     public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response)
     {
@@ -31,4 +33,25 @@ public class ShiroWebSocketSessionConfigurator
     		config.getUserProperties().put(HTTP_SESSION, request.getHttpSession());
     }
 
+//    @Override
+//    public List<Extension> getNegotiatedExtensions(List<Extension> installed,
+//                                                   List<Extension> requested)
+//    {
+//        log.info("installed:" + toString(installed));
+//        log.info("requested:" + toString(requested));
+//        return installed;
+//    }
+
+
+//    private static String toString(List<Extension> ext)
+//    {
+//        StringBuilder sb = new StringBuilder();
+//        for (Extension e : ext)
+//        {
+//            sb.append(e.getName());
+//            sb.append(", ");
+//        }
+//
+//        return sb.toString();
+//    }
 }
