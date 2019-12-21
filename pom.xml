@@ -88,12 +88,19 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
         </dependency>
+
+
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache-org.version}</version>
+        </dependency>
       <!--
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-servlet-plugin</artifactId>
       </dependency>
-      -->
+     -->
         <!--  
         <dependency>
       		<groupId>net.sf.ehcache</groupId>
@@ -140,11 +147,7 @@
 		  <artifactId>cache-api</artifactId>
 		</dependency>
 		
-		<dependency>
-	      <groupId>org.ehcache</groupId>
-	      <artifactId>ehcache</artifactId>
-        <version>${ehcache-org.version}</version>
-	    </dependency>
+
 	    
 
     </dependencies>

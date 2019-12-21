@@ -28,15 +28,16 @@ public abstract class ShiroBaseWebListener
     extends EnvironmentLoaderListener
 {
 
-	private static final transient Logger log = Logger.getLogger(Const.LOGGER_NAME);
+	private static final transient Logger log = Logger.getLogger(ShiroBaseWebListener.class.getName());
 	
 	protected abstract void init(WebSecurityManager wsm);
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce)
     {
-		log.info("Initialized");
+		log.info("SHIRO ENV Initializing ----------------------------------------------------");
 		init(initEnvironment(sce.getServletContext()).getWebSecurityManager());
+		log.info("SHIRO ENV Initialized ----------------------------------------------------");
 	}	
 	
 	@Override
