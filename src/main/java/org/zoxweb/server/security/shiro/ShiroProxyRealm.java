@@ -18,23 +18,14 @@ package org.zoxweb.server.security.shiro;
 import java.util.*;
 import java.util.logging.Logger;
 
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.zoxweb.server.security.shiro.authc.DomainAuthenticationInfo;
-import org.zoxweb.server.security.shiro.authc.DomainUsernamePasswordToken;
+
 import org.zoxweb.shared.api.APIDataStore;
 import org.zoxweb.shared.crypto.PasswordDAO;
 import org.zoxweb.shared.db.QueryMarker;
 import org.zoxweb.shared.security.shiro.LoginStatusDAO;
 import org.zoxweb.shared.security.shiro.ShiroAssociationRuleDAO;
 import org.zoxweb.shared.util.Const;
-import org.zoxweb.shared.util.NVPair;
-import org.zoxweb.shared.util.SharedUtil;
+
 
 public class ShiroProxyRealm extends ShiroBaseRealm
 {

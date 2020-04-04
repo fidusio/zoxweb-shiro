@@ -25,6 +25,7 @@ public class ShiroWebSocketSessionConfigurator
     extends ServerEndpointConfig.Configurator
 {
     public static final String HTTP_SESSION = "http_session";
+    @SuppressWarnings("unused")
     private static final Logger log = Logger.getLogger(ShiroWebSocketSessionConfigurator.class.getName());
     @Override
     public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response)

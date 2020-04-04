@@ -22,7 +22,6 @@ import javax.servlet.ServletContextEvent;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 
-import org.zoxweb.shared.util.Const;
 
 public abstract class ShiroBaseWebListener
     extends EnvironmentLoaderListener
