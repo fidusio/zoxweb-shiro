@@ -8,7 +8,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.zoxweb.server.security.shiro.authz.ManualAuthorizationCheck;
 //import org.zoxweb.server.security.shiro.authz.PermissionsProp;
-import org.zoxweb.shared.annotation.DataProperties;
+import org.zoxweb.shared.annotation.DataProp;
 
 public class ShiroResourcePropScanner
 {
@@ -53,7 +53,7 @@ public class ShiroResourcePropScanner
 			RequiresPermissions permissionAnnot = null;
 			RequiresRoles rolesAnnot = null;
 			ManualAuthorizationCheck permissionsProp = null;
-			DataProperties dataProp = null;
+			DataProp dataProp = null;
 			
 			
 			for (Annotation a : m.getAnnotations())
@@ -75,9 +75,9 @@ public class ShiroResourcePropScanner
 				{
 					permissionsProp = (ManualAuthorizationCheck) a;
 				}
-				else if (a.annotationType() == DataProperties.class)
+				else if (a.annotationType() == DataProp.class)
 				{
-					dataProp = (DataProperties) a;
+					dataProp = (DataProp) a;
 				}
 			}
 			

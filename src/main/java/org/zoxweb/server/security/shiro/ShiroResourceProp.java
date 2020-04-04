@@ -8,7 +8,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.zoxweb.server.security.shiro.authz.ManualAuthorizationCheck;
 //import org.zoxweb.server.security.shiro.authz.PermissionsProp;
-import org.zoxweb.shared.annotation.DataProperties;
+import org.zoxweb.shared.annotation.DataProp;
 
 public class ShiroResourceProp<T>
 {
@@ -18,10 +18,10 @@ public class ShiroResourceProp<T>
 	public final RequiresRoles roles;
 	public final RequiresPermissions permissions;
 	public final ManualAuthorizationCheck manualAuthorizationCheck;
-	public final DataProperties dataProperties;
+	public final DataProp dataProperties;
 	
 	
-	public ShiroResourceProp(T resource, boolean authc, RequiresRoles roles, RequiresPermissions permissions, ManualAuthorizationCheck mac,DataProperties dp)
+	public ShiroResourceProp(T resource, boolean authc, RequiresRoles roles, RequiresPermissions permissions, ManualAuthorizationCheck mac, DataProp dp)
 	{
 		this.resource = resource;
 		this.isAuthcRequired = authc;

@@ -38,7 +38,7 @@ import org.zoxweb.server.security.shiro.ShiroUtil;
 import org.zoxweb.server.security.shiro.authc.JWTAuthenticationToken;
 import org.zoxweb.server.util.GSONUtil;
 import org.zoxweb.server.util.cache.JWTTokenCache;
-import org.zoxweb.shared.annotation.DataProperties;
+import org.zoxweb.shared.annotation.DataProp;
 import org.zoxweb.shared.api.APIError;
 import org.zoxweb.shared.api.APIException;
 import org.zoxweb.shared.data.ApplicationConfigDAO;
@@ -331,7 +331,7 @@ public abstract class ShiroBaseServlet
 	{
 		ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(httpMethod);
 		// check if we need to autoconvert data object
-		DataProperties dct = srpm !=null ? srpm.dataProperties : null;
+		DataProp dct = srpm !=null ? srpm.dataProperties : null;
 		if (dct != null && dct.dataAutoConvert())
 		{
 			HTTPRequestAttributes hra = (HTTPRequestAttributes) req.getAttribute(HTTPRequestAttributes.HRA);
