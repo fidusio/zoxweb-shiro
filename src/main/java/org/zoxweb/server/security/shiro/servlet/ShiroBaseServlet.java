@@ -330,7 +330,7 @@ public abstract class ShiroBaseServlet
 	protected void dataDecoding(HTTPMethod httpMethod, HttpServletRequest req, HttpServletResponse res)
 	{
 		ShiroResourceProp<Method> srpm = (ShiroResourceProp<Method>) resourceProps.lookupByResourceMap(httpMethod);
-		// check if we need to autoconvert data object
+		// check if we need to auto convert data object
 		DataProp dct = srpm !=null ? srpm.dataProperties : null;
 		if (dct != null && dct.dataAutoConvert())
 		{
