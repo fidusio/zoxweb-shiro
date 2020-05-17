@@ -50,7 +50,7 @@ import org.zoxweb.shared.http.HTTPMethod;
 import org.zoxweb.shared.http.HTTPStatusCode;
 import org.zoxweb.shared.security.AccessException;
 import org.zoxweb.shared.security.JWTToken;
-import org.zoxweb.shared.security.SecurityConsts.AuthType;
+import org.zoxweb.shared.security.SecurityConsts.AuthenticationType;
 import org.zoxweb.shared.util.AppIDURI;
 import org.zoxweb.shared.util.Const;
 import org.zoxweb.shared.util.Const.Bool;
@@ -187,7 +187,7 @@ public abstract class ShiroBaseServlet
         	
         	Exception exp = null;
             Subject subject = SecurityUtils.getSubject();
-            AuthType reqAuth = AuthType.NONE;
+            AuthenticationType reqAuth = AuthenticationType.NONE;
 
             if (subject == null || !subject.isAuthenticated())
             {
@@ -225,7 +225,7 @@ public abstract class ShiroBaseServlet
                 	catch(Exception e)
                 	{
                 		exp = e;
-                		reqAuth = AuthType.BEARER;
+                		reqAuth = AuthenticationType.BEARER;
                 	}
                 }
                 else
@@ -257,14 +257,14 @@ public abstract class ShiroBaseServlet
                 	}
                 	catch(Exception e)
                 	{
-                		reqAuth = AuthType.BASIC;
+                		reqAuth = AuthenticationType.BASIC;
                 	}
                 }
                 
                 //log.info("ReqAuth:" +reqAuth);
                 //log.info(hra.getPathInfo());
                 
-                if (reqAuth == AuthType.NONE)  	
+                if (reqAuth == AuthenticationType.NONE)
                 {
               
                 	ApplicationConfigDAO acd = ResourceManager.SINGLETON.lookup(ApplicationConfigDAO.RESOURCE_NAME);
