@@ -333,8 +333,7 @@ public class APISecurityManagerProvider
 				{
 					return;
 				}
-				
-				
+
 				/// must create a exclusion filter
 				if (!(nve instanceof UserIDDAO || nve instanceof MessageTemplateDAO))
 					nve.setUserID(userID != null ? userID : currentUserID());

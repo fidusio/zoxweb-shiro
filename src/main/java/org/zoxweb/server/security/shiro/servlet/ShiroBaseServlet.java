@@ -68,7 +68,7 @@ public abstract class ShiroBaseServlet
 {
 
     public static final APIError DEFAULT_API_ERROR = new APIError(new AccessException("Access denied.", null, true));
-    private static final transient Logger log = Logger.getLogger(ShiroBaseServlet.class.getName());
+    protected static final transient Logger log = Logger.getLogger(ShiroBaseServlet.class.getName());
     
     
     //public static final String SECURITY_CHECK = "SECURITY_CHECK";
