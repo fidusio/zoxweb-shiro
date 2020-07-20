@@ -23,9 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import io.xlogistx.http.servlet.HTTPServletUtil;
 import org.apache.shiro.subject.Subject;
 import org.zoxweb.server.http.HTTPRequestAttributes;
-import org.zoxweb.server.http.servlet.HTTPServletUtil;
 import org.zoxweb.server.util.GSONUtil;
 import org.zoxweb.server.util.ServerUtil;
 import org.zoxweb.shared.api.APIError;
